@@ -1,1 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petty Cash Reconciler</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F7F6F2;--surface:#fff;--surface2:#F0EEE9;--border:#E0DDD5;--border2:#C8C4BA;
+  --text:#18170F;--text2:#6B6860;--text3:#A8A59E;
+  --accent:#1B4332;--accent-bg:#EAF2EC;--accent-mid:#2D6A4F;
+  --ok:#1B4332;--ok-bg:#EAF2EC;--ok-text:#0A2518;
+  --warn:#7D4E00;--warn-bg:#FFF4DC;--warn-text:#5C3800;
+  --err:#7D1A1A;--err-bg:#FDEAEA;--err-text:#5C1010;
+  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  --r:8px;--rs:5px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5}
+header{background:var(--text);color:var(--bg);padding:0 1.5rem;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.logo-box{width:26px;height:26px;background:var(--accent-mid);border-radius:4px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;color:#fff;font-weight:500}
+.logo-text{font-size:13px;font-weight:500}
+.logo-sub{font-family:var(--mono);font-size:10px;color:#888}
+.outlet-pill{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:99px;padding:4px 12px 4px 8px;cursor:pointer}
+.outlet-dot{width:7px;height:7px;border-radius:50%;background:#4ade80}
+.tabs{background:var(--surface);border-bottom:1px solid var(--border);display:flex;padding:0 1.5rem;overflow-x:auto}
+.tab{padding:11px 18px;font-size:13px;font-weight:500;color:var(--text2);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab:hover:not(.active){color:var(--text);background:var(--surface2)}
+main{max-width:1200px;margin:0 auto;padding:1.25rem}
+.panel{display:none}.panel.active{display:flex;flex-direction:column;gap:1.1rem}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.card-hd{padding:.75rem 1.1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.card-hd-left{display:flex;align-items:center;gap:8px}
+.card-label{font-size:11px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+.card-body{padding:1.1rem}
+.step-n{width:20px;height:20px;border-radius:50%;background:var(--text);color:var(--bg);font-size:10px;font-family:var(--mono);font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.outlets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;margin-bottom:1rem}
+.outlet-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:.75rem 1rem;cursor:pointer;transition:all .15s;position:relative}
+.outlet-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.outlet-card-name{font-weight:500;font-size:13px}
+.outlet-card-float{font-family:var(--mono);font-size:11px;color:var(--text2);margin-top:2px}
+.outlet-del{position:absolute;top:7px;right:7px;font-size:11px;color:var(--text3);cursor:pointer;padding:2px 5px;border-radius:3px}
+.outlet-del:hover{background:var(--err-bg);color:var(--err)}
+.add-outlet-form{display:grid;grid-template-columns:1fr 130px auto;gap:8px;align-items:end}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-size:10px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.06em;color:var(--text2)}
+.fi{font-family:var(--sans);font-size:13px;padding:6px 9px;border:1px solid var(--border);border-radius:var(--rs);background:var(--bg);color:var(--text);outline:none;transition:border-color .15s;width:100%}
+.fi:focus{border-color:var(--accent)}
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--rs);padding:1.5rem;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg)}
+.upload-zone:hover{border-color:var(--accent);background:var(--accent-bg)}
+.upload-link{color:var(--accent);font-weight:500}
+.upload-zone p{font-size:12px;color:var(--text2);margin-top:3px}
+.loading{display:none;align-items:center;gap:10px;padding:.75rem 0;font-size:12px;color:var(--text2);font-family:var(--mono)}
+.dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:dp 1.2s infinite;display:inline-block;margin-right:3px}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes dp{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:.75rem}
+.thumb{width:56px;height:56px;object-fit:cover;border-radius:var(--rs);border:1px solid var(--border)}
+.tx-wrap{overflow-x:auto;margin-top:.5rem}
+.tx-table{width:100%;border-collapse:collapse;font-size:12px;min-width:880px}
+.tx-table th{font-size:9px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);padding:6px 6px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface2);text-align:center}
+.tx-table th.left{text-align:left}
+.tx-table td{padding:3px 4px;border-bottom:1px solid var(--surface2);vertical-align:middle;text-align:center}
+.tx-table tr:last-child td{border-bottom:none}
+.tx-table tr:hover td{background:#fafaf8}
+.th-group{background:var(--text)!important;color:var(--bg)!important;font-size:9px!important;letter-spacing:.08em;padding:4px 6px!important;text-align:center!important}
+.tx-inp{font-family:var(--mono);font-size:12px;padding:4px 6px;border:1px solid transparent;border-radius:4px;background:transparent;color:var(--text);width:100%;outline:none;transition:all .12s;text-align:right}
+.tx-inp.left{text-align:left}
+.tx-inp:focus{border-color:var(--accent);background:var(--surface)}
+.tx-inp:hover:not(:focus){border-color:var(--border2)}
+.tx-inp.overridden{border-color:#a78bfa!important;background:#f5f3ff!important}
+.tx-inp.v-ok{background:var(--accent-bg)!important;border-color:#b7dfcb!important;color:var(--ok-text)}
+.tx-inp.v-err{background:var(--err-bg)!important;border-color:#f5b8b8!important;color:var(--err)}
+.calc-cell{font-family:var(--mono);font-size:12px;padding:4px 8px;text-align:right;border-radius:4px;white-space:nowrap}
+.calc-cell.ok{color:var(--ok);background:var(--accent-bg)}
+.calc-cell.err{color:var(--err);background:var(--err-bg);font-weight:600}
+.calc-cell.neu{color:var(--text2);background:var(--surface2)}
+.calc-cell.pu{color:#6d28d9;background:#f5f3ff}
+.row-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;padding:3px 6px;border-radius:3px}
+.row-del:hover{background:var(--err-bg);color:var(--err)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;font-family:var(--mono);color:var(--text2);margin-top:.75rem}
+.leg-item{display:flex;align-items:center;gap:5px}
+.leg-swatch{width:12px;height:12px;border-radius:2px;border:1px solid}
+.sum-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--border);border-radius:var(--rs);overflow:hidden;margin-top:.875rem}
+.sc{background:var(--surface2);padding:.6rem .875rem;text-align:center}
+.sc-label{font-size:10px;font-family:var(--mono);color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.sc-val{font-size:15px;font-family:var(--mono);font-weight:500}
+.sc.hi{background:var(--accent-bg)}.sc.hi .sc-val{color:var(--ok)}
+.sc.al{background:var(--err-bg)}.sc.al .sc-val{color:var(--err)}
+.sc.pu{background:#f5f3ff}.sc.pu .sc-val{color:#6d28d9}
+.banner{display:flex;align-items:flex-start;gap:9px;padding:.75rem 1rem;border-radius:var(--rs);font-size:12px;margin-bottom:8px}
+.banner-icon{font-size:14px;flex-shrink:0}
+.banner.ok{background:var(--ok-bg);color:var(--ok-text);border:1px solid #b7dfcb}
+.banner.err{background:var(--err-bg);color:var(--err-text);border:1px solid #f5b8b8}
+.banner.info{background:#f0f9ff;color:#0c4a6e;border:1px solid #bae6fd}
+.reg-wrap{overflow-x:auto}
+.reg-table{width:100%;border-collapse:collapse;font-size:11px;min-width:900px}
+.reg-table th{font-size:9px;font-family:var(--mono);padding:6px 8px;border-bottom:1px solid var(--border);background:var(--surface2);white-space:nowrap;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;text-align:right}
+.reg-table th.left{text-align:left}
+.reg-table td{padding:6px 8px;border-bottom:1px solid var(--surface2);font-family:var(--mono);vertical-align:top;text-align:right}
+.reg-table td.left{font-family:var(--sans);font-size:12px;text-align:left}
+.reg-table tr:hover td{background:var(--surface2)}
+.badge{display:inline-block;font-size:9px;font-family:var(--mono);padding:1px 6px;border-radius:99px;font-weight:500;text-transform:uppercase}
+.badge-ok{background:var(--ok-bg);color:var(--ok-text)}
+.badge-warn{background:var(--warn-bg);color:var(--warn-text)}
+.badge-err{background:var(--err-bg);color:var(--err-text)}
+.badge-neu{background:var(--surface2);color:var(--text2)}
+.badge-pu{background:#f5f3ff;color:#6d28d9}
+.slip-total-bar{background:var(--text);color:var(--bg);border-radius:var(--rs);padding:.875rem 1.1rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.slip-total-label{font-size:11px;font-family:var(--mono);opacity:.5;text-transform:uppercase;letter-spacing:.04em}
+.slip-total-amt{font-size:24px;font-family:var(--mono);font-weight:300}
+.slip-form{display:grid;grid-template-columns:160px 1fr auto;gap:8px;align-items:end}
+.slip-card{border:1px solid var(--border);border-radius:var(--rs);overflow:hidden;margin-bottom:10px}
+.slip-card-hd{background:var(--surface2);padding:.625rem 1rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border)}
+.slip-row{display:flex;justify-content:space-between;padding:5px 1rem;border-bottom:1px solid var(--surface2);font-size:11px}
+.slip-row:last-child{border-bottom:none}
+.slip-row-label{color:var(--text2)}
+.slip-row-val{font-family:var(--mono)}
+.slip-total-row{display:flex;justify-content:space-between;padding:6px 1rem;background:var(--surface2);font-size:12px;font-family:var(--mono);font-weight:500;border-top:1px solid var(--border)}
+.cb{width:13px;height:13px;accent-color:var(--accent);cursor:pointer}
+.row-sel td{background:var(--accent-bg)!important}
+.sum-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:1rem}
+.sum-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:.75rem 1rem}
+.sum-card-label{font-size:10px;font-family:var(--mono);color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px}
+.sum-card-val{font-size:20px;font-family:var(--mono);font-weight:300}
+.sum-card.accent{background:var(--accent-bg);border-color:#b7dfcb}
+.sum-card.accent .sum-card-val{color:var(--ok)}
+.btn{font-family:var(--sans);font-size:12px;font-weight:500;padding:6px 13px;border-radius:var(--rs);cursor:pointer;border:1px solid transparent;transition:all .12s;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent-mid)}
+.btn-ghost{background:transparent;color:var(--text);border-color:var(--border)}
+.btn-ghost:hover{background:var(--surface2)}
+.btn-sm{padding:4px 9px;font-size:11px}
+.btn-danger{background:transparent;color:var(--err);border-color:#f5b8b8}
+.btn-danger:hover{background:var(--err-bg)}
+.empty{font-size:12px;color:var(--text3);text-align:center;padding:2rem;font-family:var(--mono)}
+.export-bar{display:flex;gap:7px;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);flex-wrap:wrap}
+@media(max-width:600px){.sum-strip{grid-template-columns:1fr 1fr}.add-outlet-form{grid-template-columns:1fr}.slip-form{grid-template-columns:1fr}main{padding:.875rem}}
+</style>
+</head>
+<body>
 
+<header>
+  <div class="logo">
+    <div class="logo-box">PC</div>
+    <div><div class="logo-text">Petty Cash Reconciler</div><div class="logo-sub">multi-outlet · line-by-line</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div class="outlet-pill" onclick="switchTab('outlets')">
+      <div class="outlet-dot"></div>
+      <span style="font-family:var(--mono);font-size:11px" id="activeOutletName">No outlet</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="syncStatus" style="font-family:var(--mono);font-size:11px;color:#aaa">☁️ Connecting…</span>
+      <button onclick="manualSync()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:99px;cursor:pointer">↺ Sync</button>
+    </div>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" id="tab-outlets" onclick="switchTab('outlets')">Outlets</div>
+  <div class="tab" id="tab-entry" onclick="switchTab('entry')">Daily Entry</div>
+  <div class="tab" id="tab-register" onclick="switchTab('register')">Register</div>
+  <div class="tab" id="tab-bankin" onclick="switchTab('bankin')">Bank-In Slips</div>
+</div>
+
+<main>
+
+<!-- OUTLETS -->
+<div class="panel active" id="panel-outlets">
+  <div class="card">
+    <div class="card-hd"><div class="card-label">Outlets &amp; floats</div></div>
+    <div class="card-body">
+      <div class="outlets-grid" id="outletsGrid"></div>
+      <div class="add-outlet-form">
+        <div class="field"><label>Outlet name</label><input class="fi" id="newOutletName" placeholder="e.g. Ampang"></div>
+        <div class="field"><label>Float (RM)</label><input class="fi" type="number" id="newOutletFloat" placeholder="500" min="0" step="0.01"></div>
+        <button class="btn btn-primary" onclick="addOutlet()">+ Add</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-label">How it works</div></div>
+    <div class="card-body" style="font-size:13px;color:var(--text2);line-height:1.9;display:flex;flex-direction:column;gap:4px">
+      <div><strong style="color:var(--text)">All columns captured as-is</strong> — Name, Date, Day, Opening, Cash Sales, Expenses, Closing Balance, Bank-In, Loose Change.</div>
+      <div><strong style="color:var(--text)">Only Loose Change is verified</strong> — calculated as Opening + Cash Sales − Expenses − Bank-In − Float.</div>
+      <div><strong style="color:var(--text)">Accumulated Loose</strong> — running total, auto-calculated. Override any cell; subsequent rows build from that override. Double-click to reset.</div>
+      <div><strong style="color:var(--text)">Google Sheets sync</strong> — all data is shared across devices in real time.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DAILY ENTRY -->
+<div class="panel" id="panel-entry">
+  <div class="card">
+    <div class="card-hd"><div class="card-hd-left"><div class="step-n">1</div><div class="card-label">Select outlet &amp; upload photo</div></div></div>
+    <div class="card-body">
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
+        <div class="field" style="min-width:200px">
+          <label>Outlet</label>
+          <select class="fi" id="entryOutlet" onchange="onOutletChange()"><option value="">-- select --</option></select>
+        </div>
+        <div class="field" style="min-width:140px">
+          <label>Float (RM)</label>
+          <input class="fi" type="number" id="entryFloat" placeholder="500" step="0.01" oninput="renderTxTable()">
+        </div>
+      </div>
+      <div class="upload-zone" onclick="document.getElementById('pcFile').click()">
+        <div style="font-size:22px;margin-bottom:4px">⬆</div>
+        <div><span class="upload-link">Choose photo</span> or tap to upload</div>
+        <p>Photo of your handwritten petty cash book</p>
+        <input type="file" id="pcFile" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+      </div>
+      <div class="loading" id="loadingAI"><div class="dots"><span></span><span></span><span></span></div>&nbsp;Reading transactions from photo…</div>
+      <div class="thumbs" id="photoThumbs"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-hd-left"><div class="step-n">2</div><div class="card-label">Verify &amp; edit — all cells editable</div></div>
+      <div style="display:flex;gap:7px">
+        <button class="btn btn-ghost btn-sm" onclick="addTxRow()">+ Add row</button>
+        <button class="btn btn-ghost btn-sm" onclick="recalcCarryForward()">↺ Recalc opening</button>
+      </div>
+    </div>
+    <div class="card-body" style="padding:.875rem">
+      <div class="tx-wrap">
+        <table class="tx-table" id="txTable">
+          <thead>
+            <tr>
+              <th style="width:24px">#</th>
+              <th class="left" style="min-width:80px">Name</th>
+              <th class="left" style="min-width:88px">Date</th>
+              <th style="width:46px">Day</th>
+              <th style="min-width:80px">Opening</th>
+              <th style="min-width:80px">Cash Sales</th>
+              <th style="min-width:80px">Expenses</th>
+              <th style="min-width:80px">Closing Bal</th>
+              <th style="min-width:80px">Bank-In</th>
+              <th colspan="2" class="th-group">Loose Change</th>
+              <th colspan="2" class="th-group" style="background:#4c1d95!important">Accum. Loose</th>
+              <th style="width:24px"></th>
+            </tr>
+            <tr>
+              <th colspan="9" style="border:none;background:transparent"></th>
+              <th style="min-width:80px;background:#fff7e6;color:var(--warn-text)">Calc</th>
+              <th style="min-width:80px">Stated</th>
+              <th style="min-width:80px;background:#f5f3ff;color:#6d28d9">Auto</th>
+              <th style="min-width:80px">Override</th>
+              <th style="border:none;background:transparent"></th>
+            </tr>
+          </thead>
+          <tbody id="txBody"></tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <div class="leg-item"><div class="leg-swatch" style="background:#fff7e6;border-color:#f5d98a"></div><span>Calculated</span></div>
+        <div class="leg-item"><div class="leg-swatch" style="background:var(--accent-bg);border-color:#b7dfcb"></div><span>Match ✓</span></div>
+        <div class="leg-item"><div class="leg-swatch" style="background:var(--err-bg);border-color:#f5b8b8"></div><span>Mismatch ⚠</span></div>
+        <div class="leg-item"><div class="leg-swatch" style="background:#f5f3ff;border-color:#a78bfa"></div><span>Overridden</span></div>
+      </div>
+      <div class="sum-strip">
+        <div class="sc"><div class="sc-label">Total Sales</div><div class="sc-val" id="sTotalSales">—</div></div>
+        <div class="sc"><div class="sc-label">Total Expenses</div><div class="sc-val" id="sTotalExp">—</div></div>
+        <div class="sc"><div class="sc-label">Total Banked</div><div class="sc-val" id="sTotalBanked">—</div></div>
+        <div class="sc pu"><div class="sc-label">Accum. Loose</div><div class="sc-val" id="sTotalAccum">—</div></div>
+        <div class="sc" id="scDisc"><div class="sc-label">Loose Discrepancies</div><div class="sc-val" id="sDisc">—</div></div>
+      </div>
+      <div id="entryBanners" style="margin-top:.875rem"></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:.875rem;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="saveAllEntries()">Save all rows</button>
+        <button class="btn btn-ghost" onclick="clearTxTable()">Clear table</button>
+        <span id="saveMsg" style="font-size:12px;color:var(--ok);font-family:var(--mono)"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="panel" id="panel-register">
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-label">Daily register</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select class="fi" id="regFilter" onchange="renderRegister()" style="font-size:11px;padding:4px 8px;width:auto"><option value="">All outlets</option></select>
+        <select class="fi" id="regNameFilter" onchange="renderRegister()" style="font-size:11px;padding:4px 8px;width:auto"><option value="">All staff</option></select>
+        <select class="fi" id="regDiscFilter" onchange="renderRegister()" style="font-size:11px;padding:4px 8px;width:auto">
+          <option value="">All rows</option>
+          <option value="disc">Discrepancies only</option>
+        </select>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0">
+      <div class="reg-wrap" id="registerWrap"><div class="empty">No entries yet.</div></div>
+    </div>
+    <div style="padding:.75rem 1.1rem;border-top:1px solid var(--border);display:flex;gap:7px">
+      <button class="btn btn-ghost btn-sm" onclick="exportRegCSV()">⬇ Export CSV</button>
+      <button class="btn btn-ghost btn-sm" onclick="printReg()">🖨 Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- BANK-IN SLIPS -->
+<div class="panel" id="panel-bankin">
+  <div class="sum-grid" id="slipSummary" style="display:none">
+    <div class="sum-card"><div class="sum-card-label">Total banked (RM)</div><div class="sum-card-val" id="smTotalBanked">0.00</div></div>
+    <div class="sum-card"><div class="sum-card-label">Matched (RM)</div><div class="sum-card-val" id="smMatched">0.00</div></div>
+    <div class="sum-card"><div class="sum-card-label">Unmatched (RM)</div><div class="sum-card-val" id="smUnmatched">0.00</div></div>
+    <div class="sum-card accent"><div class="sum-card-label">Slips created</div><div class="sum-card-val" id="smSlips">0</div></div>
+  </div>
+  <div class="card">
+    <div class="card-hd">
+      <div class="card-hd-left"><div class="step-n">1</div><div class="card-label">Select rows to group</div></div>
+      <div style="display:flex;gap:7px;align-items:center">
+        <select class="fi" id="slipOutletFilter" onchange="renderSlipEntries()" style="font-size:11px;padding:4px 8px;width:auto"><option value="">All outlets</option></select>
+        <button class="btn btn-ghost btn-sm" onclick="selectAllUnmatched()">Select all unmatched</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearSlipSel()">Clear</button>
+      </div>
+    </div>
+    <div class="card-body" style="padding:0"><div id="slipEntriesWrap"><div class="empty">No entries with banked-in amounts yet.</div></div></div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-hd-left"><div class="step-n">2</div><div class="card-label">Create bank-in slip</div></div></div>
+    <div class="card-body">
+      <div class="slip-total-bar">
+        <div class="slip-total-label">Selected to bank in</div>
+        <div class="slip-total-amt" id="slipSelectedTotal">RM 0.00</div>
+      </div>
+      <div class="slip-form">
+        <div class="field"><label>Bank-in date</label><input class="fi" type="date" id="slipDate"></div>
+        <div class="field"><label>Remarks (optional)</label><input class="fi" type="text" id="slipRem" placeholder="e.g. CIMB — Shaz"></div>
+        <button class="btn btn-primary" onclick="createSlip()">Create slip</button>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd"><div class="card-label">Bank-in slips</div></div>
+    <div class="card-body">
+      <div id="slipsList"><div class="empty">No slips yet.</div></div>
+      <div class="export-bar">
+        <button class="btn btn-ghost btn-sm" onclick="exportSlipsCSV()">⬇ Export CSV</button>
+        <button class="btn btn-ghost btn-sm" onclick="printSlips()">🖨 Print</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwtE2VX5K4Mt8_iogfPS64saiCEeApGPljbYyjWpeiG70eDhJRbV1axORljoAcC6C5I/exec';
+
+let outlets = JSON.parse(localStorage.getItem('pc4_outlets')||'[]');
+let entries = JSON.parse(localStorage.getItem('pc4_entries')||'[]');
+let slips   = JSON.parse(localStorage.getItem('pc4_slips')||'[]');
+let entryCounter = parseInt(localStorage.getItem('pc4_ec')||'0');
+let txRows = [];
+
+function persist(){
+  localStorage.setItem('pc4_outlets',JSON.stringify(outlets));
+  localStorage.setItem('pc4_entries',JSON.stringify(entries));
+  localStorage.setItem('pc4_slips',JSON.stringify(slips));
+  localStorage.setItem('pc4_ec',entryCounter);
+  pushToSheet();
+}
+
+// ── SYNC ──────────────────────────────────────────────────
+function setSyncStatus(s,msg){
+  const el=document.getElementById('syncStatus');if(!el)return;
+  const icons={idle:'☁️',syncing:'⏳',ok:'✅',error:'⚠️'};
+  el.textContent=(icons[s]||'')+' '+(msg||'');
+  el.style.color=s==='error'?'#fca5a5':s==='ok'?'#86efac':'#aaa';
+}
+
+async function gasGet(action){
+  const resp=await fetch(GAS_URL+'?action='+action);
+  const json=await resp.json();
+  if(!json.ok) throw new Error(json.error||'Error');
+  return json.data;
+}
+
+async function gasPost(body){
+  const resp=await fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify(body))+'&action='+body.action);
+  const json=await resp.json();
+  if(!json.ok) throw new Error(json.error||'Error');
+  return json.data;
+}
+
+async function loadFromSheet(){
+  setSyncStatus('syncing','Loading…');
+  try{
+    const data=await gasGet('getAll');
+    if(data.outlets&&data.outlets.length){outlets=data.outlets;localStorage.setItem('pc4_outlets',JSON.stringify(outlets));}
+    if(data.entries&&data.entries.length){entries=data.entries;entryCounter=Math.max(0,...entries.map(e=>+e.id||0));localStorage.setItem('pc4_entries',JSON.stringify(entries));localStorage.setItem('pc4_ec',entryCounter);}
+    if(data.slips&&data.slips.length){slips=data.slips;localStorage.setItem('pc4_slips',JSON.stringify(slips));}
+    setSyncStatus('ok','Synced ✓');
+    return true;
+  }catch(e){setSyncStatus('error','Could not load: '+e.message);return false;}
+}
+
+async function pushToSheet(){
+  setSyncStatus('syncing','Saving…');
+  try{
+    await gasPost({action:'saveOutlets',outlets});
+    await gasPost({action:'saveEntries',entries});
+    await gasPost({action:'saveSlips',slips});
+    setSyncStatus('ok','Saved ✓');
+  }catch(e){setSyncStatus('error','Sync failed: '+e.message);}
+}
+
+async function manualSync(){
+  await loadFromSheet();
+  populateAllSelects();renderOutlets();
+  const ao=getAO(),o=outlets.find(x=>x.id===ao);
+  document.getElementById('activeOutletName').textContent=o?o.name:'No outlet';
+  const active=document.querySelector('.tab.active')?.id?.replace('tab-','');
+  if(active==='register'){populateFilterSelects();renderRegister();}
+  if(active==='bankin'){populateFilterSelects();renderSlipEntries();renderSlips();updateSlipSummary();}
+  if(active==='outlets') renderOutlets();
+}
+
+// ── HELPERS ───────────────────────────────────────────────
+function fmtN(v){return(+v||0).toFixed(2);}
+function uid(){return 'r'+Date.now()+Math.random().toString(36).slice(2,5);}
+function esc(s){return(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+
+// ── TABS ──────────────────────────────────────────────────
+function switchTab(t){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  if(t==='register'){populateFilterSelects();renderRegister();}
+  if(t==='bankin'){populateFilterSelects();renderSlipEntries();renderSlips();updateSlipSummary();}
+  if(t==='entry') populateEntryOutlet();
+  if(t==='outlets') renderOutlets();
+}
+
+// ── OUTLETS ───────────────────────────────────────────────
+function renderOutlets(){
+  const g=document.getElementById('outletsGrid');
+  if(!outlets.length){g.innerHTML='<div style="color:var(--text3);font-size:12px;font-family:var(--mono)">No outlets yet.</div>';return;}
+  g.innerHTML=outlets.map(o=>`
+    <div class="outlet-card ${o.id===getAO()?'selected':''}" onclick="setAO('${o.id}')">
+      <span class="outlet-del" onclick="event.stopPropagation();delOutlet('${o.id}')">✕</span>
+      <div class="outlet-card-name">${o.name}</div>
+      <div class="outlet-card-float">Float: RM ${fmtN(o.float)}</div>
+    </div>`).join('');
+}
+function addOutlet(){
+  const name=document.getElementById('newOutletName').value.trim();
+  const flt=parseFloat(document.getElementById('newOutletFloat').value);
+  if(!name||isNaN(flt)||flt<0){alert('Enter a valid outlet name and float.');return;}
+  const id='o'+Date.now();
+  outlets.push({id,name,float:flt});
+  persist();renderOutlets();populateAllSelects();
+  document.getElementById('newOutletName').value='';
+  document.getElementById('newOutletFloat').value='';
+  if(!getAO()) setAO(id);
+}
+function delOutlet(id){
+  if(!confirm('Delete outlet? Entries are kept.'))return;
+  outlets=outlets.filter(o=>o.id!==id);
+  if(getAO()===id)localStorage.removeItem('pc4_ao');
+  persist();renderOutlets();populateAllSelects();
+}
+function setAO(id){
+  localStorage.setItem('pc4_ao',id);
+  const o=outlets.find(x=>x.id===id);
+  document.getElementById('activeOutletName').textContent=o?o.name:'None';
+  renderOutlets();
+}
+function getAO(){return localStorage.getItem('pc4_ao')||'';}
+function populateAllSelects(){
+  ['entryOutlet','regFilter','slipOutletFilter'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value,isF=id!=='entryOutlet';
+    el.innerHTML=(isF?'<option value="">All outlets</option>':'<option value="">-- select --</option>')+outlets.map(o=>`<option value="${o.id}">${o.name}</option>`).join('');
+    el.value=cur;
+  });
+}
+function populateFilterSelects(){
+  ['regFilter','slipOutletFilter'].forEach(id=>{
+    const el=document.getElementById(id);if(!el)return;
+    const cur=el.value;
+    el.innerHTML='<option value="">All outlets</option>'+outlets.map(o=>`<option value="${o.id}">${o.name}</option>`).join('');
+    el.value=cur;
+  });
+  const nameEl=document.getElementById('regNameFilter');if(!nameEl)return;
+  const curName=nameEl.value;
+  const names=[...new Set(entries.map(e=>e.name).filter(Boolean))].sort();
+  nameEl.innerHTML='<option value="">All staff</option>'+names.map(n=>`<option value="${n}">${n}</option>`).join('');
+  nameEl.value=curName;
+}
+function populateEntryOutlet(){
+  populateAllSelects();
+  const ao=getAO();
+  if(ao){document.getElementById('entryOutlet').value=ao;onOutletChange();}
+}
+function onOutletChange(){
+  const id=document.getElementById('entryOutlet').value;
+  const o=outlets.find(x=>x.id===id);
+  document.getElementById('entryFloat').value=o?o.float:'';
+  renderTxTable();
+}
+
+// ── PHOTO / AI ────────────────────────────────────────────
+function handlePhoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.createElement('img');img.src=e.target.result;img.className='thumb';
+    document.getElementById('photoThumbs').appendChild(img);
+    extractTransactions(e.target.result,file.name);
+  };
+  reader.readAsDataURL(file);input.value='';
+}
+
+async function extractTransactions(base64,filename){
+  document.getElementById('loadingAI').style.display='flex';
+  const mt=/\.png$/i.test(filename)?'image/png':'image/jpeg';
+  const prompt=`This is a handwritten petty cash book. Extract every data row. Ignore the header row.
+The columns from LEFT to RIGHT are:
+1. Name (staff name)
+2. Date
+3. Day (Mon/Tue/etc)
+4. Opening Balance
+5. Cash Sales
+6. Expenses
+7. Closing Balance
+8. Bank-In Amount (may be a sum like 650+50, add them)
+9. Loose Change
+Return ONLY a valid JSON array. No markdown. No explanation.
+Each element: {"name":"","date":"YYYY-MM-DD","day":"","opening_balance":0,"cash_sales":0,"expenses":0,"closing_balance":0,"bank_in_amount":0,"loose_change":0}
+Numbers only for numeric fields. Use 0 if blank. Year=${new Date().getFullYear()} if unclear.`;
+  try{
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mt,data:base64.split(',')[1]}},
+          {type:'text',text:prompt}
+        ]}]
+      })
+    });
+    const data=await resp.json();
+    let text=data.content.map(c=>c.text||'').join('').trim();
+    text=text.replace(/```json/gi,'').replace(/```/g,'').trim();
+    const s=text.indexOf('['),e=text.lastIndexOf(']');
+    if(s===-1||e===-1)throw new Error('No JSON array found');
+    let rows=JSON.parse(text.slice(s,e+1));
+    if(!Array.isArray(rows)){const f=Object.values(rows).find(v=>Array.isArray(v));rows=f||[];}
+    if(!rows.length){alert('No rows extracted. Add rows manually.');document.getElementById('loadingAI').style.display='none';return;}
+    txRows=rows.map(r=>({
+      _id:uid(),name:r.name||'',date:r.date||'',day:r.day||'',
+      opening:+r.opening_balance||0,sales:+r.cash_sales||0,expenses:+r.expenses||0,
+      closing:+r.closing_balance||0,bankedIn:+r.bank_in_amount||0,
+      statedLoose:+r.loose_change||0,accumOverride:null
+    }));
+    renderTxTable();
+  }catch(err){console.error(err);alert('Could not read photo. Add rows manually.');}
+  document.getElementById('loadingAI').style.display='none';
+}
+
+// ── TX TABLE ──────────────────────────────────────────────
+function addTxRow(){
+  const float=parseFloat(document.getElementById('entryFloat').value)||0;
+  const prev=txRows.length?txRows[txRows.length-1]:null;
+  txRows.push({_id:uid(),name:'',date:'',day:'',opening:prev?prev.closing:0,sales:0,expenses:0,closing:float,bankedIn:0,statedLoose:0,accumOverride:null});
+  renderTxTable();
+}
+function recalcCarryForward(){
+  for(let i=1;i<txRows.length;i++) txRows[i].opening=txRows[i-1].closing;
+  renderTxTable();
+}
+
+function renderTxTable(){
+  const float=parseFloat(document.getElementById('entryFloat').value)||0;
+  const tbody=document.getElementById('txBody');
+  if(!txRows.length){
+    tbody.innerHTML='<tr><td colspan="14" class="empty">No rows yet. Upload a photo or click "+ Add row".</td></tr>';
+    updateSummary(float);return;
+  }
+  let accumRunning=0;
+  const comp=txRows.map((r,i)=>{
+    const calcLoose=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
+    const looseOk=r.statedLoose===0||Math.abs(r.statedLoose-calcLoose)<0.01;
+    if(r.accumOverride!==null) accumRunning=r.accumOverride;
+    else accumRunning=+(accumRunning+calcLoose).toFixed(2);
+    let missingDate=false;
+    if(i>0&&r.date&&txRows[i-1].date){
+      const diff=Math.round((new Date(r.date)-new Date(txRows[i-1].date))/(864e5));
+      if(diff>1) missingDate=diff;
+    }
+    return{calcLoose,looseOk,accumAuto:accumRunning,missingDate};
+  });
+  tbody.innerHTML=txRows.map((r,i)=>{
+    const{calcLoose,looseOk,accumAuto,missingDate}=comp[i];
+    const accumOvr=r.accumOverride!==null;
+    const looseStatedCls=r.statedLoose===0?'':(looseOk?'v-ok':'v-err');
+    const missingRow=missingDate?`<tr><td colspan="14" style="background:#fff7e6;color:var(--warn-text);font-size:11px;font-family:var(--mono);padding:4px 10px;text-align:center">⚠ ${missingDate} day gap before this row</td></tr>`:'';
+    return`${missingRow}<tr>
+      <td style="color:var(--text3);font-size:10px;font-family:var(--mono)">${i+1}</td>
+      <td><input class="tx-inp left" value="${esc(r.name)}" placeholder="Name" onchange="sf('${r._id}','name',this.value)"></td>
+      <td><input class="tx-inp ${!r.date?'v-err':''}" type="date" value="${r.date}" onchange="sf('${r._id}','date',this.value)" style="text-align:left;width:110px"></td>
+      <td><input class="tx-inp" value="${esc(r.day)}" placeholder="Mon" style="width:40px" onchange="sf('${r._id}','day',this.value)"></td>
+      <td><input class="tx-inp" type="number" step="0.01" value="${r.opening||''}" placeholder="0.00" onchange="sf('${r._id}','opening',+this.value)" style="width:76px"></td>
+      <td><input class="tx-inp" type="number" step="0.01" value="${r.sales||''}" placeholder="0.00" onchange="sf('${r._id}','sales',+this.value)" style="width:76px"></td>
+      <td><input class="tx-inp" type="number" step="0.01" value="${r.expenses||''}" placeholder="0.00" onchange="sf('${r._id}','expenses',+this.value)" style="width:76px"></td>
+      <td><input class="tx-inp" type="number" step="0.01" value="${r.closing||''}" placeholder="0.00" onchange="sf('${r._id}','closing',+this.value)" style="width:76px"></td>
+      <td><input class="tx-inp" type="number" step="0.01" value="${r.bankedIn||''}" placeholder="0.00" onchange="sf('${r._id}','bankedIn',+this.value)" style="width:76px"></td>
+      <td style="background:#fffbf0"><div class="calc-cell ${calcLoose<0?'err':calcLoose>0?'neu':'ok'}">${fmtN(calcLoose)}</div></td>
+      <td><input class="tx-inp ${looseStatedCls}" type="number" step="0.01" value="${r.statedLoose||''}" placeholder="0.00" onchange="sf('${r._id}','statedLoose',+this.value)" style="width:76px"></td>
+      <td style="background:#f5f3ff"><div class="calc-cell pu">${fmtN(accumAuto)}</div></td>
+      <td><input class="tx-inp ${accumOvr?'overridden':''}" type="number" step="0.01"
+          value="${accumOvr?fmtN(r.accumOverride):''}" placeholder="${fmtN(accumAuto)}"
+          onchange="setAccumOverride('${r._id}',this.value)"
+          ondblclick="clearAccumOverride('${r._id}',this)"
+          style="width:76px"
+          title="Dbl-click to reset to auto"></td>
+      <td><button class="row-del" onclick="delRow('${r._id}')">✕</button></td>
+    </tr>`;
+  }).join('');
+  updateSummary(float);
+}
+
+function sf(id,field,val){const r=txRows.find(x=>x._id===id);if(r){r[field]=val;renderTxTable();}}
+function setAccumOverride(id,val){const r=txRows.find(x=>x._id===id);if(!r)return;const v=parseFloat(val);r.accumOverride=isNaN(v)?null:v;renderTxTable();}
+function clearAccumOverride(id,input){const r=txRows.find(x=>x._id===id);if(!r)return;r.accumOverride=null;input.value='';renderTxTable();}
+function delRow(id){txRows=txRows.filter(r=>r._id!==id);renderTxTable();}
+
+function updateSummary(float){
+  if(!txRows.length){['sTotalSales','sTotalExp','sTotalBanked','sTotalAccum','sDisc'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('entryBanners').innerHTML='';return;}
+  let tS=0,tE=0,tB=0,disc=0,accum=0,lastAccum=0;
+  txRows.forEach(r=>{
+    const cl=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
+    const ok=r.statedLoose===0||Math.abs(r.statedLoose-cl)<0.01;
+    if(r.accumOverride!==null) accum=r.accumOverride; else accum=+(accum+cl).toFixed(2);
+    lastAccum=accum;tS+=r.sales;tE+=r.expenses;tB+=r.bankedIn;if(!ok)disc++;
+  });
+  document.getElementById('sTotalSales').textContent=fmtN(tS);
+  document.getElementById('sTotalExp').textContent=fmtN(tE);
+  document.getElementById('sTotalBanked').textContent=fmtN(tB);
+  document.getElementById('sTotalAccum').textContent=fmtN(lastAccum);
+  document.getElementById('sDisc').textContent=disc;
+  document.getElementById('scDisc').className=disc>0?'sc al':'sc hi';
+  let html='';
+  if(disc===0) html+=mkBanner('ok','✓',`All ${txRows.length} rows verified.`);
+  else html+=mkBanner('err','⚠',`${disc} row(s) have a loose change discrepancy.`);
+  html+=mkBanner('info','ℹ','Double-click any purple Accum Override cell to reset to auto.');
+  document.getElementById('entryBanners').innerHTML=html;
+}
+function mkBanner(type,icon,msg){return`<div class="banner ${type}" style="margin-bottom:6px"><span class="banner-icon">${icon}</span><span>${msg}</span></div>`;}
+
+// ── SAVE ──────────────────────────────────────────────────
+function saveAllEntries(){
+  const outletId=document.getElementById('entryOutlet').value;
+  if(!outletId){alert('Please select an outlet.');return;}
+  if(!txRows.length){alert('No rows to save.');return;}
+  const outlet=outlets.find(o=>o.id===outletId);
+  const float=parseFloat(document.getElementById('entryFloat').value)||0;
+  let accum=0;
+  txRows.forEach(r=>{
+    const calcLoose=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
+    const looseOk=r.statedLoose===0||Math.abs(r.statedLoose-calcLoose)<0.01;
+    if(r.accumOverride!==null) accum=r.accumOverride; else accum=+(accum+calcLoose).toFixed(2);
+    entries.push({id:++entryCounter,outletId,outletName:outlet?outlet.name:'?',float,
+      name:r.name,date:r.date,day:r.day,opening:r.opening,sales:r.sales,expenses:r.expenses,
+      closing:r.closing,bankedIn:r.bankedIn,calcLoose,statedLoose:r.statedLoose,looseOk,
+      accumLoose:accum,accumOverridden:r.accumOverride!==null,slipId:null});
+  });
+  persist();txRows=[];renderTxTable();
+  const msg=document.getElementById('saveMsg');
+  msg.textContent=`Saved ✓ (${entries.length} total entries)`;
+  setTimeout(()=>msg.textContent='',3000);
+}
+function clearTxTable(){if(txRows.length&&!confirm('Clear all rows?'))return;txRows=[];renderTxTable();}
+
+// ── REGISTER ──────────────────────────────────────────────
+function renderRegister(){
+  const outF=document.getElementById('regFilter').value;
+  const nameF=document.getElementById('regNameFilter').value;
+  const discF=document.getElementById('regDiscFilter').value;
+  const wrap=document.getElementById('registerWrap');
+  let rows=[...entries].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  if(outF) rows=rows.filter(e=>e.outletId===outF);
+  if(nameF) rows=rows.filter(e=>e.name===nameF);
+  if(discF==='disc') rows=rows.filter(e=>!e.looseOk);
+  if(!rows.length){wrap.innerHTML='<div class="empty">No entries found.</div>';return;}
+  wrap.innerHTML=`<table class="reg-table"><thead><tr>
+    <th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th>
+    <th>Opening</th><th>Sales</th><th>Expenses</th><th>Closing</th><th>Banked In</th>
+    <th>Loose Calc</th><th>Loose Stated</th><th>✓</th><th>Accum Loose</th><th>Slip</th><th></th>
+  </tr></thead><tbody>${rows.map(e=>`<tr>
+    <td class="left">${e.date}</td><td class="left">${e.day||'—'}</td>
+    <td class="left">${e.outletName}</td><td class="left">${e.name||'—'}</td>
+    <td>${fmtN(e.opening)}</td><td>${fmtN(e.sales)}</td><td>${fmtN(e.expenses)}</td>
+    <td>${fmtN(e.closing)}</td><td style="font-weight:500">${fmtN(e.bankedIn)}</td>
+    <td style="color:${e.calcLoose<0?'var(--err)':e.calcLoose>0?'var(--warn)':'var(--ok)'}">${fmtN(e.calcLoose)}</td>
+    <td>${fmtN(e.statedLoose)}</td>
+    <td>${e.looseOk?'<span class="badge badge-ok">OK</span>':'<span class="badge badge-err">⚠</span>'}</td>
+    <td style="color:#6d28d9">${fmtN(e.accumLoose)}${e.accumOverridden?' <span class="badge badge-pu">ovr</span>':''}</td>
+    <td>${e.slipId?'<span class="badge badge-ok">Matched</span>':(e.bankedIn>0?'<span class="badge badge-warn">Pending</span>':'<span class="badge badge-neu">—</span>')}</td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteEntry(${e.id})">✕</button></td>
+  </tr>`).join('')}</tbody></table>`;
+}
+function deleteEntry(id){
+  if(!confirm('Delete this entry?'))return;
+  entries=entries.filter(e=>e.id!==id);
+  persist();renderRegister();renderSlipEntries();
+}
+
+// ── BANK-IN SLIPS ─────────────────────────────────────────
+function renderSlipEntries(){
+  const filter=document.getElementById('slipOutletFilter').value;
+  const wrap=document.getElementById('slipEntriesWrap');
+  let rows=entries.filter(e=>e.bankedIn>0);
+  if(filter) rows=rows.filter(e=>e.outletId===filter);
+  rows.sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  if(!rows.length){wrap.innerHTML='<div class="empty">No entries with banked-in amounts.</div>';return;}
+  wrap.innerHTML=`<div style="overflow-x:auto"><table class="reg-table"><thead><tr>
+    <th style="width:30px;text-align:center"></th>
+    <th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th>
+    <th>Banked In (RM)</th><th>Status</th>
+  </tr></thead><tbody>${rows.map(e=>`<tr class="${e._slipSel?'row-sel':''}">
+    <td style="text-align:center"><input type="checkbox" class="cb" ${e._slipSel?'checked':''} ${e.slipId?'disabled':''} onchange="toggleSlipSel(${e.id})"></td>
+    <td class="left">${e.date}</td><td class="left">${e.day||'—'}</td>
+    <td class="left">${e.outletName}</td><td class="left">${e.name||'—'}</td>
+    <td style="font-weight:500">${fmtN(e.bankedIn)}</td>
+    <td>${e.slipId?'<span class="badge badge-ok">Matched</span>':'<span class="badge badge-warn">Pending</span>'}</td>
+  </tr>`).join('')}</tbody></table></div>`;
+  updateSlipSelTotal();
+}
+function toggleSlipSel(id){const e=entries.find(x=>x.id===id);if(e&&!e.slipId)e._slipSel=!e._slipSel;renderSlipEntries();}
+function selectAllUnmatched(){entries.filter(e=>e.bankedIn>0&&!e.slipId).forEach(e=>e._slipSel=true);renderSlipEntries();}
+function clearSlipSel(){entries.forEach(e=>e._slipSel=false);renderSlipEntries();}
+function updateSlipSelTotal(){
+  const t=entries.filter(e=>e._slipSel).reduce((s,e)=>s+e.bankedIn,0);
+  document.getElementById('slipSelectedTotal').textContent='RM '+fmtN(t);
+}
+function createSlip(){
+  const date=document.getElementById('slipDate').value;
+  const rem=document.getElementById('slipRem').value.trim();
+  const sel=entries.filter(e=>e._slipSel&&!e.slipId);
+  if(!date){alert('Enter bank-in date.');return;}
+  if(!sel.length){alert('Select at least one entry.');return;}
+  const slipId='s'+Date.now();
+  const total=+sel.reduce((s,e)=>s+e.bankedIn,0).toFixed(2);
+  sel.forEach(e=>{e.slipId=slipId;e._slipSel=false;});
+  slips.push({id:slipId,date,remarks:rem,total,lines:sel.map(e=>({date:e.date,day:e.day,outlet:e.outletName,name:e.name,amount:e.bankedIn}))});
+  persist();
+  document.getElementById('slipDate').value='';document.getElementById('slipRem').value='';
+  renderSlipEntries();renderSlips();updateSlipSummary();renderRegister();
+}
+function deleteSlip(id){
+  if(!confirm('Remove slip? Entries return to pending.'))return;
+  entries.forEach(e=>{if(e.slipId===id)e.slipId=null;});
+  slips=slips.filter(s=>s.id!==id);
+  persist();renderSlipEntries();renderSlips();updateSlipSummary();renderRegister();
+}
+function renderSlips(){
+  const wrap=document.getElementById('slipsList');
+  if(!slips.length){wrap.innerHTML='<div class="empty">No slips yet.</div>';return;}
+  wrap.innerHTML=slips.slice().reverse().map(s=>`
+    <div class="slip-card">
+      <div class="slip-card-hd">
+        <div>
+          <div style="font-family:var(--mono);font-size:13px;font-weight:500">Bank-in: ${s.date}</div>
+          ${s.remarks?`<div style="font-size:11px;color:var(--text2);margin-top:1px">${s.remarks}</div>`:''}
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-family:var(--mono);font-size:17px;color:var(--ok)">RM ${fmtN(s.total)}</div>
+          <button class="btn btn-danger btn-sm" onclick="deleteSlip('${s.id}')">✕ Remove</button>
+        </div>
+      </div>
+      ${s.lines.map(l=>`<div class="slip-row">
+        <span class="slip-row-label">${l.date}${l.day?' ('+l.day+')':''} — ${l.outlet}${l.name?' · '+l.name:''}</span>
+        <span class="slip-row-val">${fmtN(l.amount)}</span>
+      </div>`).join('')}
+      <div class="slip-total-row"><span>Total</span><span>RM ${fmtN(s.total)}</span></div>
+    </div>`).join('');
+}
+function updateSlipSummary(){
+  const tb=+entries.filter(e=>e.bankedIn>0).reduce((s,e)=>s+e.bankedIn,0).toFixed(2);
+  const m=+entries.filter(e=>e.slipId).reduce((s,e)=>s+e.bankedIn,0).toFixed(2);
+  document.getElementById('smTotalBanked').textContent=fmtN(tb);
+  document.getElementById('smMatched').textContent=fmtN(m);
+  document.getElementById('smUnmatched').textContent=fmtN(+(tb-m).toFixed(2));
+  document.getElementById('smSlips').textContent=slips.length;
+  document.getElementById('slipSummary').style.display=entries.length?'grid':'none';
+}
+
+// ── EXPORT / PRINT ────────────────────────────────────────
+function exportRegCSV(){
+  if(!entries.length){alert('No entries to export.');return;}
+  let csv='Date,Day,Outlet,Staff,Opening,Sales,Expenses,Closing,Banked In,Loose Calc,Loose Stated,Loose OK,Accum Loose,Accum Overridden,Slip\n';
+  [...entries].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id).forEach(e=>{
+    csv+=`"${e.date}","${e.day||''}","${e.outletName}","${e.name||''}",${fmtN(e.opening)},${fmtN(e.sales)},${fmtN(e.expenses)},${fmtN(e.closing)},${fmtN(e.bankedIn)},${fmtN(e.calcLoose)},${fmtN(e.statedLoose)},${e.looseOk?'OK':'DISCREPANCY'},${fmtN(e.accumLoose)},${e.accumOverridden?'YES':'NO'},${e.slipId?'Matched':'Pending'}\n`;
+  });
+  dl(csv,'petty-cash-register.csv');
+}
+function exportSlipsCSV(){
+  if(!slips.length){alert('No slips to export.');return;}
+  let csv='Bank-in Date,Remarks,Entry Date,Day,Outlet,Staff,Amount (RM),Slip Total (RM)\n';
+  slips.forEach(s=>s.lines.forEach(l=>{
+    csv+=`"${s.date}","${s.remarks||''}","${l.date}","${l.day||''}","${l.outlet}","${l.name||''}",${fmtN(l.amount)},${fmtN(s.total)}\n`;
+  }));
+  dl(csv,'petty-cash-slips.csv');
+}
+function dl(c,f){
+  const blob=new Blob([c],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=f;
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},100);
+}
+function printReg(){
+  if(!entries.length){alert('Nothing to print.');return;}
+  const rows=[...entries].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  const html=`<html><head><title>Petty Cash Register</title>
+  <style>body{font-family:monospace;font-size:9px;padding:1rem}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:3px 5px;text-align:right}th{background:#f0f0f0}.left{text-align:left}.ok{color:green}.err{color:red;font-weight:bold}.pu{color:#6d28d9}</style>
+  </head><body><h2>Petty Cash Register — ${new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'})}</h2>
+  <table><thead><tr><th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th><th>Opening</th><th>Sales</th><th>Exp</th><th>Closing</th><th>Banked</th><th>Loose Calc</th><th>Loose Stated</th><th>✓</th><th>Accum</th><th>Slip</th></tr></thead>
+  <tbody>${rows.map(e=>`<tr><td class="left">${e.date}</td><td class="left">${e.day||'—'}</td><td class="left">${e.outletName}</td><td class="left">${e.name||'—'}</td><td>${fmtN(e.opening)}</td><td>${fmtN(e.sales)}</td><td>${fmtN(e.expenses)}</td><td>${fmtN(e.closing)}</td><td>${fmtN(e.bankedIn)}</td><td class="${e.calcLoose<0?'err':''}">${fmtN(e.calcLoose)}</td><td>${fmtN(e.statedLoose)}</td><td class="${e.looseOk?'ok':'err'}">${e.looseOk?'OK':'⚠'}</td><td class="pu">${fmtN(e.accumLoose)}</td><td>${e.slipId?'Matched':'Pending'}</td></tr>`).join('')}</tbody></table></body></html>`;
+  printHtml(html);
+}
+function printSlips(){
+  if(!slips.length){alert('No slips to print.');return;}
+  let html=`<html><head><title>Bank-In Slips</title><style>body{font-family:monospace;font-size:11px;padding:1.5rem}.slip{margin-bottom:1.5rem;border:1px solid #ccc;padding:1rem}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:4px 7px}th{background:#f5f5f5}.tot{font-weight:bold}</style></head><body><h2>Bank-In Slips — ${new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'})}</h2>`;
+  slips.slice().reverse().forEach(s=>{html+=`<div class="slip"><strong>Bank-in: ${s.date}${s.remarks?' — '+s.remarks:''} | RM ${fmtN(s.total)}</strong><table><thead><tr><th>Date</th><th>Day</th><th>Outlet</th><th>Staff</th><th>Amount</th></tr></thead><tbody>${s.lines.map(l=>`<tr><td>${l.date}</td><td>${l.day||'—'}</td><td>${l.outlet}</td><td>${l.name||'—'}</td><td>${fmtN(l.amount)}</td></tr>`).join('')}<tr class="tot"><td colspan="4">Total</td><td>RM ${fmtN(s.total)}</td></tr></tbody></table></div>`;});
+  html+='</body></html>';
+  printHtml(html);
+}
+function printHtml(html){
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const w=window.open(url,'_blank');
+  if(w) w.onload=()=>{w.print();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  else{alert('Pop-up blocked. Please allow pop-ups to print.');URL.revokeObjectURL(url);}
+}
+
+// ── INIT ──────────────────────────────────────────────────
+(async function(){
+  populateAllSelects();renderOutlets();
+  const ao=getAO(),o=outlets.find(x=>x.id===ao);
+  document.getElementById('activeOutletName').textContent=o?o.name:'No outlet';
+  renderTxTable();
+  const ok=await loadFromSheet();
+  if(ok){
+    populateAllSelects();renderOutlets();
+    const ao2=getAO(),o2=outlets.find(x=>x.id===ao2);
+    document.getElementById('activeOutletName').textContent=o2?o2.name:'No outlet';
+  }
+})();
+</script>
+</body>
+</html>
