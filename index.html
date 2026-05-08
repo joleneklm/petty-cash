@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Petty Cash Reconciler v2</title>
+<title>Petty Cash Reconciler</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -351,8 +351,8 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
 </main>
 
 <script>
-const GEMINI_KEY = 'AIzaSyDGRKwK4nfSgffnQVqma47oIqm4CZ86NEI';
-const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+const GEMINI_KEY = 'AIzaSyCbFGNlSgp5qgWlzOix0znTkS8em8k4UGI';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent';
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwtE2VX5K4Mt8_iogfPS64saiCEeApGPljbYyjWpeiG70eDhJRbV1axORljoAcC6C5I/exec';
 
 let outlets = JSON.parse(localStorage.getItem('pc4_outlets')||'[]');
@@ -709,7 +709,7 @@ function renderRegister(){
     <td>${e.looseOk?'<span class="badge badge-ok">OK</span>':'<span class="badge badge-err">⚠</span>'}</td>
     <td style="color:#6d28d9">${fmtN(e.accumLoose)}${e.accumOverridden?' <span class="badge badge-pu">ovr</span>':''}</td>
     <td>${e.slipId?'<span class="badge badge-ok">Matched</span>':(e.bankedIn>0?'<span class="badge badge-warn">Pending</span>':'<span class="badge badge-neu">—</span>')}</td>
-    <td><button class="btn btn-danger btn-sm" onclick="deleteEntry(${e.id})">✕</button></td>
+    <td><button class="btn btn-danger btn-sm" onclick="deleteEntry(${e.id})" style="padding:3px 8px;font-size:11px">✕ Delete</button></td>
   </tr>`).join('')}</tbody></table>`;
 }
 function deleteEntry(id){
