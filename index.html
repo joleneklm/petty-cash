@@ -554,6 +554,7 @@ Numbers only for numeric fields. Use 0 if blank. Year=${new Date().getFullYear()
     });
     const data=await resp.json();
     if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
+    if(!data.choices||!data.choices.length) throw new Error('No response from Mistral: '+JSON.stringify(data));
     let text=data.choices[0].message.content.trim();
     text=text.replace(/```json/gi,'').replace(/```/g,'').trim();
     const s=text.indexOf('['),e=text.lastIndexOf(']');
