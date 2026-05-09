@@ -351,8 +351,8 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
 </main>
 
 <script>
-const OPENAI_KEY = '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';
-const OPENAI_URL = 'https://api.openai.com/v1/chat/completions';
+const ANTHROPIC_KEY = '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';
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbwtE2VX5K4Mt8_iogfPS64saiCEeApGPljbYyjWpeiG70eDhJRbV1axORljoAcC6C5I/exec';
 
 let outlets = JSON.parse(localStorage.getItem('pc4_outlets')||'[]');
@@ -539,23 +539,22 @@ Return ONLY a valid JSON array. No markdown. No explanation.
 Each element: {"name":"","date":"YYYY-MM-DD","day":"","opening_balance":0,"cash_sales":0,"expenses":0,"closing_balance":0,"bank_in_amount":0,"loose_change":0}
 Numbers only for numeric fields. Use 0 if blank. Year=${new Date().getFullYear()} if unclear.`;
   try{
-    const resp=await fetch(OPENAI_URL,{
+    const resp=await fetch(ANTHROPIC_URL,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Bearer '+OPENAI_KEY},
+      headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
       body:JSON.stringify({
-        model:'gpt-4o-mini',
-        messages:[{role:'user',content:[
-          {type:'image_url',image_url:{url:`data:${mimeType};base64,${base64.split(',')[1]}`}},
-          {type:'text',text:prompt}
-        ]}],
+        model:'claude-haiku-4-5-20251001',
         max_tokens:2000,
-        temperature:0
+        messages:[{role:'user',content:[
+          {type:'image',source:{type:'base64',media_type:mimeType,data:base64.split(',')[1]}},
+          {type:'text',text:prompt}
+        ]}]
       })
     });
     const data=await resp.json();
     if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
-    if(!data.choices||!data.choices.length) throw new Error('No response: '+JSON.stringify(data));
-    let text=data.choices[0].message.content.trim();
+    if(!data.content||!data.content.length) throw new Error('No response: '+JSON.stringify(data));
+    let text=data.content[0].text.trim();
     text=text.replace(/```json/gi,'').replace(/```/g,'').trim();
     const s=text.indexOf('['),e=text.lastIndexOf(']');
     if(s===-1||e===-1) throw new Error('No JSON array found');
