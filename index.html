@@ -352,8 +352,7 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
 
 <script>
 const ANTHROPIC_KEY = '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';
-const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwtE2VX5K4Mt8_iogfPS64saiCEeApGPljbYyjWpeiG70eDhJRbV1axORljoAcC6C5I/exec';
+const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';const GAS_URL = 'https://script.google.com/macros/s/AKfycbwDEf4vKhY3z7SIr9ep1ilxqscDwoybS6llkmj_IqexlwaRtGbKE5Co8Zhu-h7yp3UY/exec';
 
 let outlets = JSON.parse(localStorage.getItem('pc4_outlets')||'[]');
 let entries = JSON.parse(localStorage.getItem('pc4_entries')||'[]');
@@ -524,41 +523,13 @@ function handlePhoto(input){
 async function extractTransactions(base64,filename){
   document.getElementById('loadingAI').style.display='flex';
   const mimeType=/\.png$/i.test(filename)?'image/png':'image/jpeg';
-  const prompt=`This is a handwritten petty cash book. Extract every data row. Ignore the header row.
-The columns from LEFT to RIGHT are:
-1. Name (staff name)
-2. Date
-3. Day (Mon/Tue/etc)
-4. Opening Balance
-5. Cash Sales
-6. Expenses
-7. Closing Balance
-8. Bank-In Amount (may be a sum like 650+50, add them together)
-9. Loose Change
-Return ONLY a valid JSON array. No markdown. No explanation.
-Each element: {"name":"","date":"YYYY-MM-DD","day":"","opening_balance":0,"cash_sales":0,"expenses":0,"closing_balance":0,"bank_in_amount":0,"loose_change":0}
-Numbers only for numeric fields. Use 0 if blank. Year=${new Date().getFullYear()} if unclear.`;
   try{
-    const resp=await fetch(ANTHROPIC_URL,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01'},
-      body:JSON.stringify({
-        model:'claude-haiku-4-5-20251001',
-        max_tokens:2000,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:mimeType,data:base64.split(',')[1]}},
-          {type:'text',text:prompt}
-        ]}]
-      })
-    });
+    // Route through Google Apps Script to avoid CORS
+    const payload={action:'extractPhoto',imageBase64:base64.split(',')[1],mimeType};
+    const resp=await fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify(payload))+'&action=extractPhoto');
     const data=await resp.json();
-    if(data.error) throw new Error(data.error.message||JSON.stringify(data.error));
-    if(!data.content||!data.content.length) throw new Error('No response: '+JSON.stringify(data));
-    let text=data.content[0].text.trim();
-    text=text.replace(/```json/gi,'').replace(/```/g,'').trim();
-    const s=text.indexOf('['),e=text.lastIndexOf(']');
-    if(s===-1||e===-1) throw new Error('No JSON array found');
-    let rows=JSON.parse(text.slice(s,e+1));
+    if(!data.ok) throw new Error(data.error||'Extraction failed');
+    let rows=data.data;
     if(!Array.isArray(rows)){const f=Object.values(rows).find(v=>Array.isArray(v));rows=f||[];}
     if(!rows.length){alert('No rows extracted. Add rows manually.');document.getElementById('loadingAI').style.display='none';return;}
     txRows=rows.map(r=>({
