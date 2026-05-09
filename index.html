@@ -61,7 +61,7 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
 .thumb{width:56px;height:56px;object-fit:cover;border-radius:var(--rs);border:1px solid var(--border)}
 .tx-wrap{overflow-x:auto;margin-top:.5rem}
 .tx-table{width:100%;border-collapse:collapse;font-size:12px;min-width:880px}
-.tx-table th{font-size:9px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);padding:6px 6px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface2);text-align:center}
+.tx-table th{font-size:9px;font-family:var(--mono);font-weight:500;text-transform:uppercase;letter-spacing:.05em;color:var(--text2);padding:6px;border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface2);text-align:center}
 .tx-table th.left{text-align:left}
 .tx-table td{padding:3px 4px;border-bottom:1px solid var(--surface2);vertical-align:middle;text-align:center}
 .tx-table tr:last-child td{border-bottom:none}
@@ -142,7 +142,6 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo">
     <div class="logo-box">PC</div>
@@ -154,21 +153,18 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
       <span style="font-family:var(--mono);font-size:11px" id="activeOutletName">No outlet</span>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
-      <span id="syncStatus" style="font-family:var(--mono);font-size:11px;color:#aaa">☁️ Connecting…</span>
+      <span id="syncStatus" style="font-family:var(--mono);font-size:11px;color:#aaa">☁️</span>
       <button onclick="manualSync()" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:99px;cursor:pointer">↺ Sync</button>
     </div>
   </div>
 </header>
-
 <div class="tabs">
   <div class="tab active" id="tab-outlets" onclick="switchTab('outlets')">Outlets</div>
   <div class="tab" id="tab-entry" onclick="switchTab('entry')">Daily Entry</div>
   <div class="tab" id="tab-register" onclick="switchTab('register')">Register</div>
   <div class="tab" id="tab-bankin" onclick="switchTab('bankin')">Bank-In Slips</div>
 </div>
-
 <main>
-
 <!-- OUTLETS -->
 <div class="panel active" id="panel-outlets">
   <div class="card">
@@ -188,25 +184,17 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
       <div><strong style="color:var(--text)">All columns captured as-is</strong> — Name, Date, Day, Opening, Cash Sales, Expenses, Closing Balance, Bank-In, Loose Change.</div>
       <div><strong style="color:var(--text)">Only Loose Change is verified</strong> — calculated as Opening + Cash Sales − Expenses − Bank-In − Float.</div>
       <div><strong style="color:var(--text)">Accumulated Loose</strong> — running total, auto-calculated. Override any cell; subsequent rows build from that override. Double-click to reset.</div>
-      <div><strong style="color:var(--text)">Google Sheets sync</strong> — all data is shared across devices in real time.</div>
     </div>
   </div>
 </div>
-
 <!-- DAILY ENTRY -->
 <div class="panel" id="panel-entry">
   <div class="card">
     <div class="card-hd"><div class="card-hd-left"><div class="step-n">1</div><div class="card-label">Select outlet &amp; upload photo</div></div></div>
     <div class="card-body">
       <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
-        <div class="field" style="min-width:200px">
-          <label>Outlet</label>
-          <select class="fi" id="entryOutlet" onchange="onOutletChange()"><option value="">-- select --</option></select>
-        </div>
-        <div class="field" style="min-width:140px">
-          <label>Float (RM)</label>
-          <input class="fi" type="number" id="entryFloat" placeholder="500" step="0.01" oninput="renderTxTable()">
-        </div>
+        <div class="field" style="min-width:200px"><label>Outlet</label><select class="fi" id="entryOutlet" onchange="onOutletChange()"><option value="">-- select --</option></select></div>
+        <div class="field" style="min-width:140px"><label>Float (RM)</label><input class="fi" type="number" id="entryFloat" placeholder="500" step="0.01" oninput="renderTxTable()"></div>
       </div>
       <div class="upload-zone" onclick="document.getElementById('pcFile').click()">
         <div style="font-size:22px;margin-bottom:4px">⬆</div>
@@ -278,7 +266,6 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
     </div>
   </div>
 </div>
-
 <!-- REGISTER -->
 <div class="panel" id="panel-register">
   <div class="card">
@@ -288,21 +275,17 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
         <select class="fi" id="regFilter" onchange="renderRegister()" style="font-size:11px;padding:4px 8px;width:auto"><option value="">All outlets</option></select>
         <select class="fi" id="regNameFilter" onchange="renderRegister()" style="font-size:11px;padding:4px 8px;width:auto"><option value="">All staff</option></select>
         <select class="fi" id="regDiscFilter" onchange="renderRegister()" style="font-size:11px;padding:4px 8px;width:auto">
-          <option value="">All rows</option>
-          <option value="disc">Discrepancies only</option>
+          <option value="">All rows</option><option value="disc">Discrepancies only</option>
         </select>
       </div>
     </div>
-    <div class="card-body" style="padding:0">
-      <div class="reg-wrap" id="registerWrap"><div class="empty">No entries yet.</div></div>
-    </div>
+    <div class="card-body" style="padding:0"><div class="reg-wrap" id="registerWrap"><div class="empty">No entries yet.</div></div></div>
     <div style="padding:.75rem 1.1rem;border-top:1px solid var(--border);display:flex;gap:7px">
       <button class="btn btn-ghost btn-sm" onclick="exportRegCSV()">⬇ Export CSV</button>
       <button class="btn btn-ghost btn-sm" onclick="printReg()">🖨 Print</button>
     </div>
   </div>
 </div>
-
 <!-- BANK-IN SLIPS -->
 <div class="panel" id="panel-bankin">
   <div class="sum-grid" id="slipSummary" style="display:none">
@@ -325,10 +308,7 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
   <div class="card">
     <div class="card-hd"><div class="card-hd-left"><div class="step-n">2</div><div class="card-label">Create bank-in slip</div></div></div>
     <div class="card-body">
-      <div class="slip-total-bar">
-        <div class="slip-total-label">Selected to bank in</div>
-        <div class="slip-total-amt" id="slipSelectedTotal">RM 0.00</div>
-      </div>
+      <div class="slip-total-bar"><div class="slip-total-label">Selected to bank in</div><div class="slip-total-amt" id="slipSelectedTotal">RM 0.00</div></div>
       <div class="slip-form">
         <div class="field"><label>Bank-in date</label><input class="fi" type="date" id="slipDate"></div>
         <div class="field"><label>Remarks (optional)</label><input class="fi" type="text" id="slipRem" placeholder="e.g. CIMB — Shaz"></div>
@@ -347,103 +327,66 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
     </div>
   </div>
 </div>
-
 </main>
 
 <script>
-// No API keys needed here — all AI calls go through Google Apps Script
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbwDEf4vKhY3z7SIr9ep1ilxqscDwoybS6llkmj_IqexlwaRtGbKE5Co8Zhu-h7yp3UY/exec';const GAS_URL = 'https://script.google.com/macros/s/AKfycbwDEf4vKhY3z7SIr9ep1ilxqscDwoybS6llkmj_IqexlwaRtGbKE5Co8Zhu-h7yp3UY/exec';
-
-let outlets = JSON.parse(localStorage.getItem('pc4_outlets')||'[]');
-let entries = JSON.parse(localStorage.getItem('pc4_entries')||'[]');
-let slips   = JSON.parse(localStorage.getItem('pc4_slips')||'[]');
-let entryCounter = parseInt(localStorage.getItem('pc4_ec')||'0');
-let txRows = [];
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbwDEf4vKhY3z7SIr9ep1ilxqscDwoybS6llkmj_IqexlwaRtGbKE5Co8Zhu-h7yp3UY/exec';
+var outlets = JSON.parse(localStorage.getItem('pc4_outlets')||'[]');
+var entries = JSON.parse(localStorage.getItem('pc4_entries')||'[]');
+var slips   = JSON.parse(localStorage.getItem('pc4_slips')||'[]');
+var entryCounter = parseInt(localStorage.getItem('pc4_ec')||'0');
+var txRows = [];
 
 function persist(){
-  try{
-    localStorage.setItem('pc4_outlets',JSON.stringify(outlets));
-    localStorage.setItem('pc4_entries',JSON.stringify(entries));
-    localStorage.setItem('pc4_slips',JSON.stringify(slips));
-    localStorage.setItem('pc4_ec',entryCounter);
-  }catch(e){ console.warn('LocalStorage error:',e); }
-  // Push to sheet in background
-  setTimeout(()=>{ try{ pushToSheet(); }catch(e){ console.warn('Sync error:',e); } },0);
+  localStorage.setItem('pc4_outlets',JSON.stringify(outlets));
+  localStorage.setItem('pc4_entries',JSON.stringify(entries));
+  localStorage.setItem('pc4_slips',JSON.stringify(slips));
+  localStorage.setItem('pc4_ec',entryCounter);
+  syncToSheet();
 }
 
-// ── SYNC ──────────────────────────────────────────────────
 function setSyncStatus(s,msg){
-  const el=document.getElementById('syncStatus');if(!el)return;
-  const icons={idle:'☁️',syncing:'⏳',ok:'✅',error:'⚠️'};
-  el.textContent=(icons[s]||'')+' '+(msg||'');
+  var el=document.getElementById('syncStatus');
+  if(!el)return;
+  var icons={idle:'☁️',syncing:'⏳',ok:'✅',error:'⚠️'};
+  el.textContent=(icons[s]||'☁️')+' '+(msg||'');
   el.style.color=s==='error'?'#fca5a5':s==='ok'?'#86efac':'#aaa';
 }
 
-async function gasGet(action){
-  const resp=await fetch(GAS_URL+'?action='+action);
-  const json=await resp.json();
-  if(!json.ok) throw new Error(json.error||'Error');
-  return json.data;
+function syncToSheet(){
+  setSyncStatus('syncing','Saving…');
+  fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveOutlets',outlets}))+'&action=saveOutlets')
+  .then(function(){return fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveEntries',entries}))+'&action=saveEntries');})
+  .then(function(){return fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveSlips',slips}))+'&action=saveSlips');})
+  .then(function(){setSyncStatus('ok','Saved ✓');})
+  .catch(function(e){setSyncStatus('error','Offline');console.warn('Sync:',e);});
 }
 
-async function gasPost(body){
-  const resp=await fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify(body))+'&action='+body.action);
-  const json=await resp.json();
-  if(!json.ok) throw new Error(json.error||'Error');
-  return json.data;
-}
-
-async function loadFromSheet(){
+function manualSync(){
   setSyncStatus('syncing','Loading…');
-  try{
-    const resp = await Promise.race([
-      fetch(GAS_URL+'?action=getAll'),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),10000))
-    ]);
-    const data=await resp.json();
-    if(!data.ok) throw new Error(data.error||'Error');
-    const d=data.data;
+  fetch(GAS_URL+'?action=getAll')
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(!data.ok) throw new Error(data.error);
+    var d=data.data;
     if(d.outlets&&d.outlets.length){outlets=d.outlets;localStorage.setItem('pc4_outlets',JSON.stringify(outlets));}
-    if(d.entries&&d.entries.length){entries=d.entries;entryCounter=Math.max(0,...entries.map(e=>+e.id||0));localStorage.setItem('pc4_entries',JSON.stringify(entries));localStorage.setItem('pc4_ec',entryCounter);}
+    if(d.entries&&d.entries.length){entries=d.entries;entryCounter=Math.max.apply(null,[0].concat(entries.map(function(e){return +e.id||0;})));localStorage.setItem('pc4_entries',JSON.stringify(entries));localStorage.setItem('pc4_ec',entryCounter);}
     if(d.slips&&d.slips.length){slips=d.slips;localStorage.setItem('pc4_slips',JSON.stringify(slips));}
     setSyncStatus('ok','Synced ✓');
-    return true;
-  }catch(e){setSyncStatus('error','Offline — using local data');return false;}
+    populateAllSelects();renderOutlets();
+    var ao=getAO(),o=outlets.find(function(x){return x.id===ao;});
+    document.getElementById('activeOutletName').textContent=o?o.name:'No outlet';
+  })
+  .catch(function(e){setSyncStatus('error','Offline');console.warn('Sync:',e);});
 }
 
-async function pushToSheet(){
-  setSyncStatus('syncing','Saving…');
-  try{
-    const resp = await Promise.race([
-      fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveOutlets',outlets}))+'&action=saveOutlets'),
-      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),10000))
-    ]);
-    await fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveEntries',entries}))+'&action=saveEntries');
-    await fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveSlips',slips}))+'&action=saveSlips');
-    setSyncStatus('ok','Saved ✓');
-  }catch(e){setSyncStatus('error','Saved locally only');}
-}
-
-async function manualSync(){
-  await loadFromSheet();
-  populateAllSelects();renderOutlets();
-  const ao=getAO(),o=outlets.find(x=>x.id===ao);
-  document.getElementById('activeOutletName').textContent=o?o.name:'No outlet';
-  const active=document.querySelector('.tab.active')?.id?.replace('tab-','');
-  if(active==='register'){populateFilterSelects();renderRegister();}
-  if(active==='bankin'){populateFilterSelects();renderSlipEntries();renderSlips();updateSlipSummary();}
-  if(active==='outlets') renderOutlets();
-}
-
-// ── HELPERS ───────────────────────────────────────────────
 function fmtN(v){return(+v||0).toFixed(2);}
 function uid(){return 'r'+Date.now()+Math.random().toString(36).slice(2,5);}
 function esc(s){return(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
 
-// ── TABS ──────────────────────────────────────────────────
 function switchTab(t){
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
   document.getElementById('panel-'+t).classList.add('active');
   document.getElementById('tab-'+t).classList.add('active');
   if(t==='register'){populateFilterSelects();renderRegister();}
@@ -452,187 +395,194 @@ function switchTab(t){
   if(t==='outlets') renderOutlets();
 }
 
-// ── OUTLETS ───────────────────────────────────────────────
 function renderOutlets(){
-  const g=document.getElementById('outletsGrid');
+  var g=document.getElementById('outletsGrid');
   if(!outlets.length){g.innerHTML='<div style="color:var(--text3);font-size:12px;font-family:var(--mono)">No outlets yet.</div>';return;}
-  g.innerHTML=outlets.map(o=>`
-    <div class="outlet-card ${o.id===getAO()?'selected':''}" onclick="setAO('${o.id}')">
-      <span class="outlet-del" onclick="event.stopPropagation();delOutlet('${o.id}')">✕</span>
-      <div class="outlet-card-name">${o.name}</div>
-      <div class="outlet-card-float">Float: RM ${fmtN(o.float)}</div>
-    </div>`).join('');
+  g.innerHTML=outlets.map(function(o){
+    return '<div class="outlet-card '+(o.id===getAO()?'selected':'')+'" onclick="setAO(\''+o.id+'\')">'
+      +'<span class="outlet-del" onclick="event.stopPropagation();delOutlet(\''+o.id+'\')">✕</span>'
+      +'<div class="outlet-card-name">'+o.name+'</div>'
+      +'<div class="outlet-card-float">Float: RM '+fmtN(o.float)+'</div></div>';
+  }).join('');
 }
+
 function addOutlet(){
-  try{
-    const name=document.getElementById('newOutletName').value.trim();
-    const flt=parseFloat(document.getElementById('newOutletFloat').value);
-    if(!name||isNaN(flt)||flt<0){alert('Enter a valid outlet name and float.');return;}
-    const id='o'+Date.now();
-    outlets.push({id,name,float:flt});
-    localStorage.setItem('pc4_outlets',JSON.stringify(outlets));
-    renderOutlets();populateAllSelects();
-    document.getElementById('newOutletName').value='';
-    document.getElementById('newOutletFloat').value='';
-    if(!getAO()) setAO(id);
-    // Push to sheet in background, don't block
-    try{ pushToSheet(); }catch(e){ console.warn('Sync error:',e); }
-  }catch(e){ alert('Error adding outlet: '+e.message); }
+  var name=document.getElementById('newOutletName').value.trim();
+  var flt=parseFloat(document.getElementById('newOutletFloat').value);
+  if(!name||isNaN(flt)||flt<0){alert('Enter a valid outlet name and float.');return;}
+  var id='o'+Date.now();
+  outlets.push({id:id,name:name,float:flt});
+  persist();renderOutlets();populateAllSelects();
+  document.getElementById('newOutletName').value='';
+  document.getElementById('newOutletFloat').value='';
+  if(!getAO()) setAO(id);
 }
+
 function delOutlet(id){
   if(!confirm('Delete outlet? Entries are kept.'))return;
-  outlets=outlets.filter(o=>o.id!==id);
+  outlets=outlets.filter(function(o){return o.id!==id;});
   if(getAO()===id)localStorage.removeItem('pc4_ao');
   persist();renderOutlets();populateAllSelects();
 }
+
 function setAO(id){
   localStorage.setItem('pc4_ao',id);
-  const o=outlets.find(x=>x.id===id);
+  var o=outlets.find(function(x){return x.id===id;});
   document.getElementById('activeOutletName').textContent=o?o.name:'None';
   renderOutlets();
 }
+
 function getAO(){return localStorage.getItem('pc4_ao')||'';}
+
 function populateAllSelects(){
-  ['entryOutlet','regFilter','slipOutletFilter'].forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    const cur=el.value,isF=id!=='entryOutlet';
-    el.innerHTML=(isF?'<option value="">All outlets</option>':'<option value="">-- select --</option>')+outlets.map(o=>`<option value="${o.id}">${o.name}</option>`).join('');
+  ['entryOutlet','regFilter','slipOutletFilter'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    var cur=el.value,isF=id!=='entryOutlet';
+    el.innerHTML=(isF?'<option value="">All outlets</option>':'<option value="">-- select --</option>')
+      +outlets.map(function(o){return '<option value="'+o.id+'">'+o.name+'</option>';}).join('');
     el.value=cur;
   });
 }
+
 function populateFilterSelects(){
-  ['regFilter','slipOutletFilter'].forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    const cur=el.value;
-    el.innerHTML='<option value="">All outlets</option>'+outlets.map(o=>`<option value="${o.id}">${o.name}</option>`).join('');
+  ['regFilter','slipOutletFilter'].forEach(function(id){
+    var el=document.getElementById(id);if(!el)return;
+    var cur=el.value;
+    el.innerHTML='<option value="">All outlets</option>'+outlets.map(function(o){return '<option value="'+o.id+'">'+o.name+'</option>';}).join('');
     el.value=cur;
   });
-  const nameEl=document.getElementById('regNameFilter');if(!nameEl)return;
-  const curName=nameEl.value;
-  const names=[...new Set(entries.map(e=>e.name).filter(Boolean))].sort();
-  nameEl.innerHTML='<option value="">All staff</option>'+names.map(n=>`<option value="${n}">${n}</option>`).join('');
+  var nameEl=document.getElementById('regNameFilter');if(!nameEl)return;
+  var curName=nameEl.value;
+  var names=[...new Set(entries.map(function(e){return e.name;}).filter(Boolean))].sort();
+  nameEl.innerHTML='<option value="">All staff</option>'+names.map(function(n){return '<option value="'+n+'">'+n+'</option>';}).join('');
   nameEl.value=curName;
 }
+
 function populateEntryOutlet(){
   populateAllSelects();
-  const ao=getAO();
+  var ao=getAO();
   if(ao){document.getElementById('entryOutlet').value=ao;onOutletChange();}
 }
+
 function onOutletChange(){
-  const id=document.getElementById('entryOutlet').value;
-  const o=outlets.find(x=>x.id===id);
+  var id=document.getElementById('entryOutlet').value;
+  var o=outlets.find(function(x){return x.id===id;});
   document.getElementById('entryFloat').value=o?o.float:'';
   renderTxTable();
 }
 
-// ── PHOTO / AI ────────────────────────────────────────────
 function handlePhoto(input){
-  const file=input.files[0];if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=document.createElement('img');img.src=e.target.result;img.className='thumb';
+  var file=input.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(e){
+    var img=document.createElement('img');img.src=e.target.result;img.className='thumb';
     document.getElementById('photoThumbs').appendChild(img);
     extractTransactions(e.target.result,file.name);
   };
   reader.readAsDataURL(file);input.value='';
 }
 
-async function extractTransactions(base64,filename){
+function extractTransactions(base64,filename){
   document.getElementById('loadingAI').style.display='flex';
-  const mimeType=/\.png$/i.test(filename)?'image/png':'image/jpeg';
-  try{
-    // Route through Google Apps Script to avoid CORS
-    const payload={action:'extractPhoto',imageBase64:base64.split(',')[1],mimeType};
-    const resp=await fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify(payload))+'&action=extractPhoto');
-    const data=await resp.json();
+  var mimeType=/\.png$/i.test(filename)?'image/png':'image/jpeg';
+  var payload={action:'extractPhoto',imageBase64:base64.split(',')[1],mimeType:mimeType};
+  fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify(payload))+'&action=extractPhoto')
+  .then(function(r){return r.json();})
+  .then(function(data){
     if(!data.ok) throw new Error(data.error||'Extraction failed');
-    let rows=data.data;
-    if(!Array.isArray(rows)){const f=Object.values(rows).find(v=>Array.isArray(v));rows=f||[];}
+    var rows=data.data;
+    if(!Array.isArray(rows)){var f=Object.values(rows).find(function(v){return Array.isArray(v);});rows=f||[];}
     if(!rows.length){alert('No rows extracted. Add rows manually.');document.getElementById('loadingAI').style.display='none';return;}
-    txRows=rows.map(r=>({
+    txRows=rows.map(function(r){return {
       _id:uid(),name:r.name||'',date:r.date||'',day:r.day||'',
       opening:+r.opening_balance||0,sales:+r.cash_sales||0,expenses:+r.expenses||0,
       closing:+r.closing_balance||0,bankedIn:+r.bank_in_amount||0,
       statedLoose:+r.loose_change||0,accumOverride:null
-    }));
+    };});
     renderTxTable();
-  }catch(err){console.error(err);alert('Could not read photo: '+err.message+'\nPlease add rows manually.');}
-  document.getElementById('loadingAI').style.display='none';
+    document.getElementById('loadingAI').style.display='none';
+  })
+  .catch(function(err){
+    console.error(err);
+    alert('Could not read photo: '+err.message+'\nPlease add rows manually.');
+    document.getElementById('loadingAI').style.display='none';
+  });
 }
 
-// ── TX TABLE ──────────────────────────────────────────────
 function addTxRow(){
-  const float=parseFloat(document.getElementById('entryFloat').value)||0;
-  const prev=txRows.length?txRows[txRows.length-1]:null;
+  var float=parseFloat(document.getElementById('entryFloat').value)||0;
+  var prev=txRows.length?txRows[txRows.length-1]:null;
   txRows.push({_id:uid(),name:'',date:'',day:'',opening:prev?prev.closing:0,sales:0,expenses:0,closing:float,bankedIn:0,statedLoose:0,accumOverride:null});
   renderTxTable();
 }
+
 function recalcCarryForward(){
-  for(let i=1;i<txRows.length;i++) txRows[i].opening=txRows[i-1].closing;
+  for(var i=1;i<txRows.length;i++) txRows[i].opening=txRows[i-1].closing;
   renderTxTable();
 }
 
 function renderTxTable(){
-  const float=parseFloat(document.getElementById('entryFloat').value)||0;
-  const tbody=document.getElementById('txBody');
+  var float=parseFloat(document.getElementById('entryFloat').value)||0;
+  var tbody=document.getElementById('txBody');
   if(!txRows.length){
     tbody.innerHTML='<tr><td colspan="14" class="empty">No rows yet. Upload a photo or click "+ Add row".</td></tr>';
     updateSummary(float);return;
   }
-  let accumRunning=0;
-  const comp=txRows.map((r,i)=>{
-    const calcLoose=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
-    const looseOk=r.statedLoose===0||Math.abs(r.statedLoose-calcLoose)<0.01;
+  var accumRunning=0;
+  var comp=txRows.map(function(r,i){
+    var calcLoose=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
+    var looseOk=r.statedLoose===0||Math.abs(r.statedLoose-calcLoose)<0.01;
     if(r.accumOverride!==null) accumRunning=r.accumOverride;
     else accumRunning=+(accumRunning+calcLoose).toFixed(2);
-    let missingDate=false;
+    var missingDate=false;
     if(i>0&&r.date&&txRows[i-1].date){
-      const diff=Math.round((new Date(r.date)-new Date(txRows[i-1].date))/(864e5));
+      var diff=Math.round((new Date(r.date)-new Date(txRows[i-1].date))/(864e5));
       if(diff>1) missingDate=diff;
     }
-    return{calcLoose,looseOk,accumAuto:accumRunning,missingDate};
+    return{calcLoose:calcLoose,looseOk:looseOk,accumAuto:accumRunning,missingDate:missingDate};
   });
-  tbody.innerHTML=txRows.map((r,i)=>{
-    const{calcLoose,looseOk,accumAuto,missingDate}=comp[i];
-    const accumOvr=r.accumOverride!==null;
-    const looseStatedCls=r.statedLoose===0?'':(looseOk?'v-ok':'v-err');
-    const missingRow=missingDate?`<tr><td colspan="14" style="background:#fff7e6;color:var(--warn-text);font-size:11px;font-family:var(--mono);padding:4px 10px;text-align:center">⚠ ${missingDate} day gap before this row</td></tr>`:'';
-    return`${missingRow}<tr>
-      <td style="color:var(--text3);font-size:10px;font-family:var(--mono)">${i+1}</td>
-      <td><input class="tx-inp left" value="${esc(r.name)}" placeholder="Name" onchange="sf('${r._id}','name',this.value)"></td>
-      <td><input class="tx-inp ${!r.date?'v-err':''}" type="date" value="${r.date}" onchange="sf('${r._id}','date',this.value)" style="text-align:left;width:110px"></td>
-      <td><input class="tx-inp" value="${esc(r.day)}" placeholder="Mon" style="width:40px" onchange="sf('${r._id}','day',this.value)"></td>
-      <td><input class="tx-inp" type="number" step="0.01" value="${r.opening||''}" placeholder="0.00" onchange="sf('${r._id}','opening',+this.value)" style="width:76px"></td>
-      <td><input class="tx-inp" type="number" step="0.01" value="${r.sales||''}" placeholder="0.00" onchange="sf('${r._id}','sales',+this.value)" style="width:76px"></td>
-      <td><input class="tx-inp" type="number" step="0.01" value="${r.expenses||''}" placeholder="0.00" onchange="sf('${r._id}','expenses',+this.value)" style="width:76px"></td>
-      <td><input class="tx-inp" type="number" step="0.01" value="${r.closing||''}" placeholder="0.00" onchange="sf('${r._id}','closing',+this.value)" style="width:76px"></td>
-      <td><input class="tx-inp" type="number" step="0.01" value="${r.bankedIn||''}" placeholder="0.00" onchange="sf('${r._id}','bankedIn',+this.value)" style="width:76px"></td>
-      <td style="background:#fffbf0"><div class="calc-cell ${calcLoose<0?'err':calcLoose>0?'neu':'ok'}">${fmtN(calcLoose)}</div></td>
-      <td><input class="tx-inp ${looseStatedCls}" type="number" step="0.01" value="${r.statedLoose||''}" placeholder="0.00" onchange="sf('${r._id}','statedLoose',+this.value)" style="width:76px"></td>
-      <td style="background:#f5f3ff"><div class="calc-cell pu">${fmtN(accumAuto)}</div></td>
-      <td><input class="tx-inp ${accumOvr?'overridden':''}" type="number" step="0.01"
-          value="${accumOvr?fmtN(r.accumOverride):''}" placeholder="${fmtN(accumAuto)}"
-          onchange="setAccumOverride('${r._id}',this.value)"
-          ondblclick="clearAccumOverride('${r._id}',this)"
-          style="width:76px"
-          title="Dbl-click to reset to auto"></td>
-      <td><button class="row-del" onclick="delRow('${r._id}')">✕</button></td>
-    </tr>`;
+  tbody.innerHTML=txRows.map(function(r,i){
+    var c=comp[i];
+    var accumOvr=r.accumOverride!==null;
+    var looseStatedCls=r.statedLoose===0?'':(c.looseOk?'v-ok':'v-err');
+    var missingRow=c.missingDate?'<tr><td colspan="14" style="background:#fff7e6;color:var(--warn-text);font-size:11px;font-family:var(--mono);padding:4px 10px;text-align:center">⚠ '+c.missingDate+' day gap before this row</td></tr>':'';
+    return missingRow+'<tr>'
+      +'<td style="color:var(--text3);font-size:10px;font-family:var(--mono)">'+(i+1)+'</td>'
+      +'<td><input class="tx-inp left" value="'+esc(r.name)+'" placeholder="Name" onchange="sf(\''+r._id+'\',\'name\',this.value)"></td>'
+      +'<td><input class="tx-inp '+(r.date?'':'v-err')+'" type="date" value="'+r.date+'" onchange="sf(\''+r._id+'\',\'date\',this.value)" style="text-align:left;width:110px"></td>'
+      +'<td><input class="tx-inp" value="'+esc(r.day)+'" placeholder="Mon" style="width:40px" onchange="sf(\''+r._id+'\',\'day\',this.value)"></td>'
+      +'<td><input class="tx-inp" type="number" step="0.01" value="'+(r.opening||'')+'" placeholder="0.00" onchange="sf(\''+r._id+'\',\'opening\',+this.value)" style="width:76px"></td>'
+      +'<td><input class="tx-inp" type="number" step="0.01" value="'+(r.sales||'')+'" placeholder="0.00" onchange="sf(\''+r._id+'\',\'sales\',+this.value)" style="width:76px"></td>'
+      +'<td><input class="tx-inp" type="number" step="0.01" value="'+(r.expenses||'')+'" placeholder="0.00" onchange="sf(\''+r._id+'\',\'expenses\',+this.value)" style="width:76px"></td>'
+      +'<td><input class="tx-inp" type="number" step="0.01" value="'+(r.closing||'')+'" placeholder="0.00" onchange="sf(\''+r._id+'\',\'closing\',+this.value)" style="width:76px"></td>'
+      +'<td><input class="tx-inp" type="number" step="0.01" value="'+(r.bankedIn||'')+'" placeholder="0.00" onchange="sf(\''+r._id+'\',\'bankedIn\',+this.value)" style="width:76px"></td>'
+      +'<td style="background:#fffbf0"><div class="calc-cell '+(c.calcLoose<0?'err':c.calcLoose>0?'neu':'ok')+'">'+fmtN(c.calcLoose)+'</div></td>'
+      +'<td><input class="tx-inp '+looseStatedCls+'" type="number" step="0.01" value="'+(r.statedLoose||'')+'" placeholder="0.00" onchange="sf(\''+r._id+'\',\'statedLoose\',+this.value)" style="width:76px"></td>'
+      +'<td style="background:#f5f3ff"><div class="calc-cell pu">'+fmtN(c.accumAuto)+'</div></td>'
+      +'<td><input class="tx-inp '+(accumOvr?'overridden':'')+'" type="number" step="0.01"'
+        +' value="'+(accumOvr?fmtN(r.accumOverride):'')+'" placeholder="'+fmtN(c.accumAuto)+'"'
+        +' onchange="setAccumOverride(\''+r._id+'\',this.value)"'
+        +' ondblclick="clearAccumOverride(\''+r._id+'\',this)" style="width:76px"></td>'
+      +'<td><button class="row-del" onclick="delRow(\''+r._id+'\')">✕</button></td>'
+      +'</tr>';
   }).join('');
   updateSummary(float);
 }
 
-function sf(id,field,val){const r=txRows.find(x=>x._id===id);if(r){r[field]=val;renderTxTable();}}
-function setAccumOverride(id,val){const r=txRows.find(x=>x._id===id);if(!r)return;const v=parseFloat(val);r.accumOverride=isNaN(v)?null:v;renderTxTable();}
-function clearAccumOverride(id,input){const r=txRows.find(x=>x._id===id);if(!r)return;r.accumOverride=null;input.value='';renderTxTable();}
-function delRow(id){txRows=txRows.filter(r=>r._id!==id);renderTxTable();}
+function sf(id,field,val){var r=txRows.find(function(x){return x._id===id;});if(r){r[field]=val;renderTxTable();}}
+function setAccumOverride(id,val){var r=txRows.find(function(x){return x._id===id;});if(!r)return;var v=parseFloat(val);r.accumOverride=isNaN(v)?null:v;renderTxTable();}
+function clearAccumOverride(id,input){var r=txRows.find(function(x){return x._id===id;});if(!r)return;r.accumOverride=null;input.value='';renderTxTable();}
+function delRow(id){txRows=txRows.filter(function(r){return r._id!==id;});renderTxTable();}
 
 function updateSummary(float){
-  if(!txRows.length){['sTotalSales','sTotalExp','sTotalBanked','sTotalAccum','sDisc'].forEach(id=>document.getElementById(id).textContent='—');document.getElementById('entryBanners').innerHTML='';return;}
-  let tS=0,tE=0,tB=0,disc=0,accum=0,lastAccum=0;
-  txRows.forEach(r=>{
-    const cl=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
-    const ok=r.statedLoose===0||Math.abs(r.statedLoose-cl)<0.01;
+  if(!txRows.length){
+    ['sTotalSales','sTotalExp','sTotalBanked','sTotalAccum','sDisc'].forEach(function(id){document.getElementById(id).textContent='—';});
+    document.getElementById('entryBanners').innerHTML='';return;
+  }
+  var tS=0,tE=0,tB=0,disc=0,accum=0,lastAccum=0;
+  txRows.forEach(function(r){
+    var cl=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
+    var ok=r.statedLoose===0||Math.abs(r.statedLoose-cl)<0.01;
     if(r.accumOverride!==null) accum=r.accumOverride; else accum=+(accum+cl).toFixed(2);
     lastAccum=accum;tS+=r.sales;tE+=r.expenses;tB+=r.bankedIn;if(!ok)disc++;
   });
@@ -642,145 +592,149 @@ function updateSummary(float){
   document.getElementById('sTotalAccum').textContent=fmtN(lastAccum);
   document.getElementById('sDisc').textContent=disc;
   document.getElementById('scDisc').className=disc>0?'sc al':'sc hi';
-  let html='';
-  if(disc===0) html+=mkBanner('ok','✓',`All ${txRows.length} rows verified.`);
-  else html+=mkBanner('err','⚠',`${disc} row(s) have a loose change discrepancy.`);
-  html+=mkBanner('info','ℹ','Double-click any purple Accum Override cell to reset to auto.');
+  var html='';
+  if(disc===0) html+='<div class="banner ok"><span class="banner-icon">✓</span><span>All '+txRows.length+' rows verified.</span></div>';
+  else html+='<div class="banner err"><span class="banner-icon">⚠</span><span>'+disc+' row(s) have a loose change discrepancy.</span></div>';
   document.getElementById('entryBanners').innerHTML=html;
 }
-function mkBanner(type,icon,msg){return`<div class="banner ${type}" style="margin-bottom:6px"><span class="banner-icon">${icon}</span><span>${msg}</span></div>`;}
 
-// ── SAVE ──────────────────────────────────────────────────
 function saveAllEntries(){
-  const outletId=document.getElementById('entryOutlet').value;
+  var outletId=document.getElementById('entryOutlet').value;
   if(!outletId){alert('Please select an outlet.');return;}
   if(!txRows.length){alert('No rows to save.');return;}
-  const outlet=outlets.find(o=>o.id===outletId);
-  const float=parseFloat(document.getElementById('entryFloat').value)||0;
-  let accum=0;
-  txRows.forEach(r=>{
-    const calcLoose=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
-    const looseOk=r.statedLoose===0||Math.abs(r.statedLoose-calcLoose)<0.01;
+  var outlet=outlets.find(function(o){return o.id===outletId;});
+  var float=parseFloat(document.getElementById('entryFloat').value)||0;
+  var accum=0;
+  txRows.forEach(function(r){
+    var calcLoose=+(r.opening+r.sales-r.expenses-r.bankedIn-float).toFixed(2);
+    var looseOk=r.statedLoose===0||Math.abs(r.statedLoose-calcLoose)<0.01;
     if(r.accumOverride!==null) accum=r.accumOverride; else accum=+(accum+calcLoose).toFixed(2);
-    entries.push({id:++entryCounter,outletId,outletName:outlet?outlet.name:'?',float,
+    entries.push({id:++entryCounter,outletId:outletId,outletName:outlet?outlet.name:'?',float:float,
       name:r.name,date:r.date,day:r.day,opening:r.opening,sales:r.sales,expenses:r.expenses,
-      closing:r.closing,bankedIn:r.bankedIn,calcLoose,statedLoose:r.statedLoose,looseOk,
+      closing:r.closing,bankedIn:r.bankedIn,calcLoose:calcLoose,statedLoose:r.statedLoose,looseOk:looseOk,
       accumLoose:accum,accumOverridden:r.accumOverride!==null,slipId:null});
   });
   persist();txRows=[];renderTxTable();
-  const msg=document.getElementById('saveMsg');
-  msg.textContent=`Saved ✓ (${entries.length} total entries)`;
-  setTimeout(()=>msg.textContent='',3000);
+  var msg=document.getElementById('saveMsg');
+  msg.textContent='Saved ✓ ('+entries.length+' total entries)';
+  setTimeout(function(){msg.textContent='';},3000);
 }
+
 function clearTxTable(){if(txRows.length&&!confirm('Clear all rows?'))return;txRows=[];renderTxTable();}
 
-// ── REGISTER ──────────────────────────────────────────────
 function renderRegister(){
-  const outF=document.getElementById('regFilter').value;
-  const nameF=document.getElementById('regNameFilter').value;
-  const discF=document.getElementById('regDiscFilter').value;
-  const wrap=document.getElementById('registerWrap');
-  let rows=[...entries].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-  if(outF) rows=rows.filter(e=>e.outletId===outF);
-  if(nameF) rows=rows.filter(e=>e.name===nameF);
-  if(discF==='disc') rows=rows.filter(e=>!e.looseOk);
+  var outF=document.getElementById('regFilter').value;
+  var nameF=document.getElementById('regNameFilter').value;
+  var discF=document.getElementById('regDiscFilter').value;
+  var wrap=document.getElementById('registerWrap');
+  var rows=entries.slice().sort(function(a,b){return a.date.localeCompare(b.date)||a.id-b.id;});
+  if(outF) rows=rows.filter(function(e){return e.outletId===outF;});
+  if(nameF) rows=rows.filter(function(e){return e.name===nameF;});
+  if(discF==='disc') rows=rows.filter(function(e){return !e.looseOk;});
   if(!rows.length){wrap.innerHTML='<div class="empty">No entries found.</div>';return;}
-  wrap.innerHTML=`<table class="reg-table"><thead><tr>
-    <th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th>
-    <th>Opening</th><th>Sales</th><th>Expenses</th><th>Closing</th><th>Banked In</th>
-    <th>Loose Calc</th><th>Loose Stated</th><th>✓</th><th>Accum Loose</th><th>Slip</th><th></th>
-  </tr></thead><tbody>${rows.map(e=>`<tr>
-    <td class="left">${e.date}</td><td class="left">${e.day||'—'}</td>
-    <td class="left">${e.outletName}</td><td class="left">${e.name||'—'}</td>
-    <td>${fmtN(e.opening)}</td><td>${fmtN(e.sales)}</td><td>${fmtN(e.expenses)}</td>
-    <td>${fmtN(e.closing)}</td><td style="font-weight:500">${fmtN(e.bankedIn)}</td>
-    <td style="color:${e.calcLoose<0?'var(--err)':e.calcLoose>0?'var(--warn)':'var(--ok)'}">${fmtN(e.calcLoose)}</td>
-    <td>${fmtN(e.statedLoose)}</td>
-    <td>${e.looseOk?'<span class="badge badge-ok">OK</span>':'<span class="badge badge-err">⚠</span>'}</td>
-    <td style="color:#6d28d9">${fmtN(e.accumLoose)}${e.accumOverridden?' <span class="badge badge-pu">ovr</span>':''}</td>
-    <td>${e.slipId?'<span class="badge badge-ok">Matched</span>':(e.bankedIn>0?'<span class="badge badge-warn">Pending</span>':'<span class="badge badge-neu">—</span>')}</td>
-    <td><button class="btn btn-danger btn-sm" onclick="deleteEntry(${e.id})" style="padding:3px 8px;font-size:11px">✕ Delete</button></td>
-  </tr>`).join('')}</tbody></table>`;
+  wrap.innerHTML='<table class="reg-table"><thead><tr>'
+    +'<th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th>'
+    +'<th>Opening</th><th>Sales</th><th>Expenses</th><th>Closing</th><th>Banked In</th>'
+    +'<th>Loose Calc</th><th>Loose Stated</th><th>✓</th><th>Accum Loose</th><th>Slip</th><th></th>'
+    +'</tr></thead><tbody>'
+    +rows.map(function(e){return '<tr>'
+      +'<td class="left">'+e.date+'</td><td class="left">'+(e.day||'—')+'</td>'
+      +'<td class="left">'+e.outletName+'</td><td class="left">'+(e.name||'—')+'</td>'
+      +'<td>'+fmtN(e.opening)+'</td><td>'+fmtN(e.sales)+'</td><td>'+fmtN(e.expenses)+'</td>'
+      +'<td>'+fmtN(e.closing)+'</td><td style="font-weight:500">'+fmtN(e.bankedIn)+'</td>'
+      +'<td style="color:'+(e.calcLoose<0?'var(--err)':e.calcLoose>0?'var(--warn)':'var(--ok)')+'">'+fmtN(e.calcLoose)+'</td>'
+      +'<td>'+fmtN(e.statedLoose)+'</td>'
+      +'<td>'+(e.looseOk?'<span class="badge badge-ok">OK</span>':'<span class="badge badge-err">⚠</span>')+'</td>'
+      +'<td style="color:#6d28d9">'+fmtN(e.accumLoose)+(e.accumOverridden?' <span class="badge badge-pu">ovr</span>':'')+'</td>'
+      +'<td>'+(e.slipId?'<span class="badge badge-ok">Matched</span>':(e.bankedIn>0?'<span class="badge badge-warn">Pending</span>':'<span class="badge badge-neu">—</span>'))+'</td>'
+      +'<td><button class="btn btn-danger btn-sm" onclick="deleteEntry('+e.id+')" style="padding:3px 8px;font-size:11px">✕ Delete</button></td>'
+      +'</tr>';}).join('')
+    +'</tbody></table>';
 }
+
 function deleteEntry(id){
   if(!confirm('Delete this entry?'))return;
-  entries=entries.filter(e=>e.id!==id);
+  entries=entries.filter(function(e){return e.id!==id;});
   persist();renderRegister();renderSlipEntries();
 }
 
-// ── BANK-IN SLIPS ─────────────────────────────────────────
 function renderSlipEntries(){
-  const filter=document.getElementById('slipOutletFilter').value;
-  const wrap=document.getElementById('slipEntriesWrap');
-  let rows=entries.filter(e=>e.bankedIn>0);
-  if(filter) rows=rows.filter(e=>e.outletId===filter);
-  rows.sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
+  var filter=document.getElementById('slipOutletFilter').value;
+  var wrap=document.getElementById('slipEntriesWrap');
+  var rows=entries.filter(function(e){return e.bankedIn>0;});
+  if(filter) rows=rows.filter(function(e){return e.outletId===filter;});
+  rows.sort(function(a,b){return a.date.localeCompare(b.date)||a.id-b.id;});
   if(!rows.length){wrap.innerHTML='<div class="empty">No entries with banked-in amounts.</div>';return;}
-  wrap.innerHTML=`<div style="overflow-x:auto"><table class="reg-table"><thead><tr>
-    <th style="width:30px;text-align:center"></th>
-    <th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th>
-    <th>Banked In (RM)</th><th>Status</th>
-  </tr></thead><tbody>${rows.map(e=>`<tr class="${e._slipSel?'row-sel':''}">
-    <td style="text-align:center"><input type="checkbox" class="cb" ${e._slipSel?'checked':''} ${e.slipId?'disabled':''} onchange="toggleSlipSel(${e.id})"></td>
-    <td class="left">${e.date}</td><td class="left">${e.day||'—'}</td>
-    <td class="left">${e.outletName}</td><td class="left">${e.name||'—'}</td>
-    <td style="font-weight:500">${fmtN(e.bankedIn)}</td>
-    <td>${e.slipId?'<span class="badge badge-ok">Matched</span>':'<span class="badge badge-warn">Pending</span>'}</td>
-  </tr>`).join('')}</tbody></table></div>`;
+  wrap.innerHTML='<div style="overflow-x:auto"><table class="reg-table"><thead><tr>'
+    +'<th style="width:30px;text-align:center"></th>'
+    +'<th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th>'
+    +'<th>Banked In (RM)</th><th>Status</th>'
+    +'</tr></thead><tbody>'
+    +rows.map(function(e){return '<tr class="'+(e._slipSel?'row-sel':'')+'">'
+      +'<td style="text-align:center"><input type="checkbox" class="cb" '+(e._slipSel?'checked ':' ')+(e.slipId?'disabled ':'')+'onchange="toggleSlipSel('+e.id+')"></td>'
+      +'<td class="left">'+e.date+'</td><td class="left">'+(e.day||'—')+'</td>'
+      +'<td class="left">'+e.outletName+'</td><td class="left">'+(e.name||'—')+'</td>'
+      +'<td style="font-weight:500">'+fmtN(e.bankedIn)+'</td>'
+      +'<td>'+(e.slipId?'<span class="badge badge-ok">Matched</span>':'<span class="badge badge-warn">Pending</span>')+'</td>'
+      +'</tr>';}).join('')
+    +'</tbody></table></div>';
   updateSlipSelTotal();
 }
-function toggleSlipSel(id){const e=entries.find(x=>x.id===id);if(e&&!e.slipId)e._slipSel=!e._slipSel;renderSlipEntries();}
-function selectAllUnmatched(){entries.filter(e=>e.bankedIn>0&&!e.slipId).forEach(e=>e._slipSel=true);renderSlipEntries();}
-function clearSlipSel(){entries.forEach(e=>e._slipSel=false);renderSlipEntries();}
+
+function toggleSlipSel(id){var e=entries.find(function(x){return x.id===id;});if(e&&!e.slipId)e._slipSel=!e._slipSel;renderSlipEntries();}
+function selectAllUnmatched(){entries.filter(function(e){return e.bankedIn>0&&!e.slipId;}).forEach(function(e){e._slipSel=true;});renderSlipEntries();}
+function clearSlipSel(){entries.forEach(function(e){e._slipSel=false;});renderSlipEntries();}
 function updateSlipSelTotal(){
-  const t=entries.filter(e=>e._slipSel).reduce((s,e)=>s+e.bankedIn,0);
+  var t=entries.filter(function(e){return e._slipSel;}).reduce(function(s,e){return s+e.bankedIn;},0);
   document.getElementById('slipSelectedTotal').textContent='RM '+fmtN(t);
 }
+
 function createSlip(){
-  const date=document.getElementById('slipDate').value;
-  const rem=document.getElementById('slipRem').value.trim();
-  const sel=entries.filter(e=>e._slipSel&&!e.slipId);
+  var date=document.getElementById('slipDate').value;
+  var rem=document.getElementById('slipRem').value.trim();
+  var sel=entries.filter(function(e){return e._slipSel&&!e.slipId;});
   if(!date){alert('Enter bank-in date.');return;}
   if(!sel.length){alert('Select at least one entry.');return;}
-  const slipId='s'+Date.now();
-  const total=+sel.reduce((s,e)=>s+e.bankedIn,0).toFixed(2);
-  sel.forEach(e=>{e.slipId=slipId;e._slipSel=false;});
-  slips.push({id:slipId,date,remarks:rem,total,lines:sel.map(e=>({date:e.date,day:e.day,outlet:e.outletName,name:e.name,amount:e.bankedIn}))});
+  var slipId='s'+Date.now();
+  var total=+sel.reduce(function(s,e){return s+e.bankedIn;},0).toFixed(2);
+  sel.forEach(function(e){e.slipId=slipId;e._slipSel=false;});
+  slips.push({id:slipId,date:date,remarks:rem,total:total,
+    lines:sel.map(function(e){return {date:e.date,day:e.day,outlet:e.outletName,name:e.name,amount:e.bankedIn};})
+  });
   persist();
   document.getElementById('slipDate').value='';document.getElementById('slipRem').value='';
   renderSlipEntries();renderSlips();updateSlipSummary();renderRegister();
 }
+
 function deleteSlip(id){
   if(!confirm('Remove slip? Entries return to pending.'))return;
-  entries.forEach(e=>{if(e.slipId===id)e.slipId=null;});
-  slips=slips.filter(s=>s.id!==id);
+  entries.forEach(function(e){if(e.slipId===id)e.slipId=null;});
+  slips=slips.filter(function(s){return s.id!==id;});
   persist();renderSlipEntries();renderSlips();updateSlipSummary();renderRegister();
 }
+
 function renderSlips(){
-  const wrap=document.getElementById('slipsList');
+  var wrap=document.getElementById('slipsList');
   if(!slips.length){wrap.innerHTML='<div class="empty">No slips yet.</div>';return;}
-  wrap.innerHTML=slips.slice().reverse().map(s=>`
-    <div class="slip-card">
-      <div class="slip-card-hd">
-        <div>
-          <div style="font-family:var(--mono);font-size:13px;font-weight:500">Bank-in: ${s.date}</div>
-          ${s.remarks?`<div style="font-size:11px;color:var(--text2);margin-top:1px">${s.remarks}</div>`:''}
-        </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <div style="font-family:var(--mono);font-size:17px;color:var(--ok)">RM ${fmtN(s.total)}</div>
-          <button class="btn btn-danger btn-sm" onclick="deleteSlip('${s.id}')">✕ Remove</button>
-        </div>
-      </div>
-      ${s.lines.map(l=>`<div class="slip-row">
-        <span class="slip-row-label">${l.date}${l.day?' ('+l.day+')':''} — ${l.outlet}${l.name?' · '+l.name:''}</span>
-        <span class="slip-row-val">${fmtN(l.amount)}</span>
-      </div>`).join('')}
-      <div class="slip-total-row"><span>Total</span><span>RM ${fmtN(s.total)}</span></div>
-    </div>`).join('');
+  wrap.innerHTML=slips.slice().reverse().map(function(s){
+    return '<div class="slip-card">'
+      +'<div class="slip-card-hd"><div>'
+      +'<div style="font-family:var(--mono);font-size:13px;font-weight:500">Bank-in: '+s.date+'</div>'
+      +(s.remarks?'<div style="font-size:11px;color:var(--text2);margin-top:1px">'+s.remarks+'</div>':'')
+      +'</div><div style="display:flex;align-items:center;gap:10px">'
+      +'<div style="font-family:var(--mono);font-size:17px;color:var(--ok)">RM '+fmtN(s.total)+'</div>'
+      +'<button class="btn btn-danger btn-sm" onclick="deleteSlip(\''+s.id+'\')">✕ Remove</button>'
+      +'</div></div>'
+      +s.lines.map(function(l){return '<div class="slip-row">'
+        +'<span class="slip-row-label">'+l.date+(l.day?' ('+l.day+')':'')+' — '+l.outlet+(l.name?' · '+l.name:'')+'</span>'
+        +'<span class="slip-row-val">'+fmtN(l.amount)+'</span></div>';}).join('')
+      +'<div class="slip-total-row"><span>Total</span><span>RM '+fmtN(s.total)+'</span></div></div>';
+  }).join('');
 }
+
 function updateSlipSummary(){
-  const tb=+entries.filter(e=>e.bankedIn>0).reduce((s,e)=>s+e.bankedIn,0).toFixed(2);
-  const m=+entries.filter(e=>e.slipId).reduce((s,e)=>s+e.bankedIn,0).toFixed(2);
+  var tb=+entries.filter(function(e){return e.bankedIn>0;}).reduce(function(s,e){return s+e.bankedIn;},0).toFixed(2);
+  var m=+entries.filter(function(e){return e.slipId;}).reduce(function(s,e){return s+e.bankedIn;},0).toFixed(2);
   document.getElementById('smTotalBanked').textContent=fmtN(tb);
   document.getElementById('smMatched').textContent=fmtN(m);
   document.getElementById('smUnmatched').textContent=fmtN(+(tb-m).toFixed(2));
@@ -788,73 +742,78 @@ function updateSlipSummary(){
   document.getElementById('slipSummary').style.display=entries.length?'grid':'none';
 }
 
-// ── EXPORT / PRINT ────────────────────────────────────────
 function exportRegCSV(){
   if(!entries.length){alert('No entries to export.');return;}
-  let csv='Date,Day,Outlet,Staff,Opening,Sales,Expenses,Closing,Banked In,Loose Calc,Loose Stated,Loose OK,Accum Loose,Accum Overridden,Slip\n';
-  [...entries].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id).forEach(e=>{
-    csv+=`"${e.date}","${e.day||''}","${e.outletName}","${e.name||''}",${fmtN(e.opening)},${fmtN(e.sales)},${fmtN(e.expenses)},${fmtN(e.closing)},${fmtN(e.bankedIn)},${fmtN(e.calcLoose)},${fmtN(e.statedLoose)},${e.looseOk?'OK':'DISCREPANCY'},${fmtN(e.accumLoose)},${e.accumOverridden?'YES':'NO'},${e.slipId?'Matched':'Pending'}\n`;
+  var csv='Date,Day,Outlet,Staff,Opening,Sales,Expenses,Closing,Banked In,Loose Calc,Loose Stated,Loose OK,Accum Loose,Accum Overridden,Slip\n';
+  entries.slice().sort(function(a,b){return a.date.localeCompare(b.date)||a.id-b.id;}).forEach(function(e){
+    csv+='"'+e.date+'","'+(e.day||'')+'","'+e.outletName+'","'+(e.name||'')+'",'+fmtN(e.opening)+','+fmtN(e.sales)+','+fmtN(e.expenses)+','+fmtN(e.closing)+','+fmtN(e.bankedIn)+','+fmtN(e.calcLoose)+','+fmtN(e.statedLoose)+','+(e.looseOk?'OK':'DISCREPANCY')+','+fmtN(e.accumLoose)+','+(e.accumOverridden?'YES':'NO')+','+(e.slipId?'Matched':'Pending')+'\n';
   });
   dl(csv,'petty-cash-register.csv');
 }
+
 function exportSlipsCSV(){
   if(!slips.length){alert('No slips to export.');return;}
-  let csv='Bank-in Date,Remarks,Entry Date,Day,Outlet,Staff,Amount (RM),Slip Total (RM)\n';
-  slips.forEach(s=>s.lines.forEach(l=>{
-    csv+=`"${s.date}","${s.remarks||''}","${l.date}","${l.day||''}","${l.outlet}","${l.name||''}",${fmtN(l.amount)},${fmtN(s.total)}\n`;
-  }));
+  var csv='Bank-in Date,Remarks,Entry Date,Day,Outlet,Staff,Amount (RM),Slip Total (RM)\n';
+  slips.forEach(function(s){s.lines.forEach(function(l){
+    csv+='"'+s.date+'","'+(s.remarks||'')+'","'+l.date+'","'+(l.day||'')+'","'+l.outlet+'","'+(l.name||'')+'",'+fmtN(l.amount)+','+fmtN(s.total)+'\n';
+  });});
   dl(csv,'petty-cash-slips.csv');
 }
+
 function dl(c,f){
-  const blob=new Blob([c],{type:'text/csv;charset=utf-8;'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=f;
+  var blob=new Blob([c],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a');a.href=url;a.download=f;
   document.body.appendChild(a);a.click();
-  setTimeout(()=>{URL.revokeObjectURL(url);document.body.removeChild(a);},100);
+  setTimeout(function(){URL.revokeObjectURL(url);document.body.removeChild(a);},100);
 }
+
 function printReg(){
   if(!entries.length){alert('Nothing to print.');return;}
-  const rows=[...entries].sort((a,b)=>a.date.localeCompare(b.date)||a.id-b.id);
-  const html=`<html><head><title>Petty Cash Register</title>
-  <style>body{font-family:monospace;font-size:9px;padding:1rem}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:3px 5px;text-align:right}th{background:#f0f0f0}.left{text-align:left}.ok{color:green}.err{color:red;font-weight:bold}.pu{color:#6d28d9}</style>
-  </head><body><h2>Petty Cash Register — ${new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'})}</h2>
-  <table><thead><tr><th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th><th>Opening</th><th>Sales</th><th>Exp</th><th>Closing</th><th>Banked</th><th>Loose Calc</th><th>Loose Stated</th><th>✓</th><th>Accum</th><th>Slip</th></tr></thead>
-  <tbody>${rows.map(e=>`<tr><td class="left">${e.date}</td><td class="left">${e.day||'—'}</td><td class="left">${e.outletName}</td><td class="left">${e.name||'—'}</td><td>${fmtN(e.opening)}</td><td>${fmtN(e.sales)}</td><td>${fmtN(e.expenses)}</td><td>${fmtN(e.closing)}</td><td>${fmtN(e.bankedIn)}</td><td class="${e.calcLoose<0?'err':''}">${fmtN(e.calcLoose)}</td><td>${fmtN(e.statedLoose)}</td><td class="${e.looseOk?'ok':'err'}">${e.looseOk?'OK':'⚠'}</td><td class="pu">${fmtN(e.accumLoose)}</td><td>${e.slipId?'Matched':'Pending'}</td></tr>`).join('')}</tbody></table></body></html>`;
+  var rows=entries.slice().sort(function(a,b){return a.date.localeCompare(b.date)||a.id-b.id;});
+  var html='<html><head><title>Petty Cash Register</title>'
+    +'<style>body{font-family:monospace;font-size:9px;padding:1rem}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;padding:3px 5px;text-align:right}th{background:#f0f0f0}.left{text-align:left}.ok{color:green}.err{color:red;font-weight:bold}.pu{color:#6d28d9}</style>'
+    +'</head><body><h2>Petty Cash Register — '+new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'})+'</h2>'
+    +'<table><thead><tr><th class="left">Date</th><th class="left">Day</th><th class="left">Outlet</th><th class="left">Staff</th><th>Opening</th><th>Sales</th><th>Exp</th><th>Closing</th><th>Banked</th><th>Loose Calc</th><th>Loose Stated</th><th>✓</th><th>Accum</th><th>Slip</th></tr></thead>'
+    +'<tbody>'+rows.map(function(e){return '<tr>'
+      +'<td class="left">'+e.date+'</td><td class="left">'+(e.day||'—')+'</td><td class="left">'+e.outletName+'</td><td class="left">'+(e.name||'—')+'</td>'
+      +'<td>'+fmtN(e.opening)+'</td><td>'+fmtN(e.sales)+'</td><td>'+fmtN(e.expenses)+'</td><td>'+fmtN(e.closing)+'</td><td>'+fmtN(e.bankedIn)+'</td>'
+      +'<td class="'+(e.calcLoose<0?'err':'')+'">'+fmtN(e.calcLoose)+'</td><td>'+fmtN(e.statedLoose)+'</td>'
+      +'<td class="'+(e.looseOk?'ok':'err')+'">'+(e.looseOk?'OK':'⚠')+'</td>'
+      +'<td class="pu">'+fmtN(e.accumLoose)+'</td><td>'+(e.slipId?'Matched':'Pending')+'</td>'
+      +'</tr>';}).join('')+'</tbody></table></body></html>';
   printHtml(html);
 }
+
 function printSlips(){
   if(!slips.length){alert('No slips to print.');return;}
-  let html=`<html><head><title>Bank-In Slips</title><style>body{font-family:monospace;font-size:11px;padding:1.5rem}.slip{margin-bottom:1.5rem;border:1px solid #ccc;padding:1rem}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:4px 7px}th{background:#f5f5f5}.tot{font-weight:bold}</style></head><body><h2>Bank-In Slips — ${new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'})}</h2>`;
-  slips.slice().reverse().forEach(s=>{html+=`<div class="slip"><strong>Bank-in: ${s.date}${s.remarks?' — '+s.remarks:''} | RM ${fmtN(s.total)}</strong><table><thead><tr><th>Date</th><th>Day</th><th>Outlet</th><th>Staff</th><th>Amount</th></tr></thead><tbody>${s.lines.map(l=>`<tr><td>${l.date}</td><td>${l.day||'—'}</td><td>${l.outlet}</td><td>${l.name||'—'}</td><td>${fmtN(l.amount)}</td></tr>`).join('')}<tr class="tot"><td colspan="4">Total</td><td>RM ${fmtN(s.total)}</td></tr></tbody></table></div>`;});
+  var html='<html><head><title>Bank-In Slips</title><style>body{font-family:monospace;font-size:11px;padding:1.5rem}.slip{margin-bottom:1.5rem;border:1px solid #ccc;padding:1rem}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:4px 7px}th{background:#f5f5f5}.tot{font-weight:bold}</style></head><body><h2>Bank-In Slips — '+new Date().toLocaleDateString('en-MY',{year:'numeric',month:'long',day:'numeric'})+'</h2>';
+  slips.slice().reverse().forEach(function(s){
+    html+='<div class="slip"><strong>Bank-in: '+s.date+(s.remarks?' — '+s.remarks:'')+' | RM '+fmtN(s.total)+'</strong>'
+      +'<table><thead><tr><th>Date</th><th>Day</th><th>Outlet</th><th>Staff</th><th>Amount</th></tr></thead><tbody>'
+      +s.lines.map(function(l){return '<tr><td>'+l.date+'</td><td>'+(l.day||'—')+'</td><td>'+l.outlet+'</td><td>'+(l.name||'—')+'</td><td>'+fmtN(l.amount)+'</td></tr>';}).join('')
+      +'<tr class="tot"><td colspan="4">Total</td><td>RM '+fmtN(s.total)+'</td></tr></tbody></table></div>';
+  });
   html+='</body></html>';
   printHtml(html);
 }
+
 function printHtml(html){
-  const blob=new Blob([html],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  const w=window.open(url,'_blank');
-  if(w) w.onload=()=>{w.print();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  var blob=new Blob([html],{type:'text/html'});
+  var url=URL.createObjectURL(blob);
+  var w=window.open(url,'_blank');
+  if(w) w.onload=function(){w.print();setTimeout(function(){URL.revokeObjectURL(url);},1000);}
   else{alert('Pop-up blocked. Please allow pop-ups to print.');URL.revokeObjectURL(url);}
 }
 
-// ── INIT ──────────────────────────────────────────────────
-(function(){
-  populateAllSelects();renderOutlets();
-  const ao=getAO(),o=outlets.find(x=>x.id===ao);
-  document.getElementById('activeOutletName').textContent=o?o.name:'No outlet';
-  renderTxTable();
-  setSyncStatus('idle','☁️ Local');
-  // Sync in background after page loads
-  setTimeout(()=>{
-    loadFromSheet().then(ok=>{
-      if(ok){
-        populateAllSelects();renderOutlets();
-        const ao2=getAO(),o2=outlets.find(x=>x.id===ao2);
-        document.getElementById('activeOutletName').textContent=o2?o2.name:'No outlet';
-      }
-    });
-  },2000);
-})();
+// INIT
+populateAllSelects();
+renderOutlets();
+var _ao=getAO(),_o=outlets.find(function(x){return x.id===_ao;});
+document.getElementById('activeOutletName').textContent=_o?_o.name:'No outlet';
+renderTxTable();
+setSyncStatus('idle','☁️');
+setTimeout(manualSync, 3000);
 </script>
 </body>
 </html>
