@@ -351,8 +351,7 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
 </main>
 
 <script>
-const ANTHROPIC_KEY = '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';
-const ANTHROPIC_URL = 'https://api.anthropic.com/v1/messages';const GAS_URL = 'https://script.google.com/macros/s/AKfycbwDEf4vKhY3z7SIr9ep1ilxqscDwoybS6llkmj_IqexlwaRtGbKE5Co8Zhu-h7yp3UY/exec';
+// No API keys needed here — all AI calls go through Google Apps Scriptconst GAS_URL = 'https://script.google.com/macros/s/AKfycbwDEf4vKhY3z7SIr9ep1ilxqscDwoybS6llkmj_IqexlwaRtGbKE5Co8Zhu-h7yp3UY/exec';
 
 let outlets = JSON.parse(localStorage.getItem('pc4_outlets')||'[]');
 let entries = JSON.parse(localStorage.getItem('pc4_entries')||'[]');
