@@ -838,19 +838,22 @@ function printHtml(html){
 }
 
 // ── INIT ──────────────────────────────────────────────────
-(async function(){
+(function(){
   populateAllSelects();renderOutlets();
   const ao=getAO(),o=outlets.find(x=>x.id===ao);
   document.getElementById('activeOutletName').textContent=o?o.name:'No outlet';
   renderTxTable();
-  // Load from sheet in background — don't block UI
-  loadFromSheet().then(ok=>{
-    if(ok){
-      populateAllSelects();renderOutlets();
-      const ao2=getAO(),o2=outlets.find(x=>x.id===ao2);
-      document.getElementById('activeOutletName').textContent=o2?o2.name:'No outlet';
-    }
-  });
+  setSyncStatus('idle','☁️ Local');
+  // Sync in background after page loads
+  setTimeout(()=>{
+    loadFromSheet().then(ok=>{
+      if(ok){
+        populateAllSelects();renderOutlets();
+        const ao2=getAO(),o2=outlets.find(x=>x.id===ao2);
+        document.getElementById('activeOutletName').textContent=o2?o2.name:'No outlet';
+      }
+    });
+  },2000);
 })();
 </script>
 </body>
