@@ -393,23 +393,32 @@ async function gasPost(body){
 async function loadFromSheet(){
   setSyncStatus('syncing','Loading…');
   try{
-    const data=await gasGet('getAll');
-    if(data.outlets&&data.outlets.length){outlets=data.outlets;localStorage.setItem('pc4_outlets',JSON.stringify(outlets));}
-    if(data.entries&&data.entries.length){entries=data.entries;entryCounter=Math.max(0,...entries.map(e=>+e.id||0));localStorage.setItem('pc4_entries',JSON.stringify(entries));localStorage.setItem('pc4_ec',entryCounter);}
-    if(data.slips&&data.slips.length){slips=data.slips;localStorage.setItem('pc4_slips',JSON.stringify(slips));}
+    const resp = await Promise.race([
+      fetch(GAS_URL+'?action=getAll'),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),10000))
+    ]);
+    const data=await resp.json();
+    if(!data.ok) throw new Error(data.error||'Error');
+    const d=data.data;
+    if(d.outlets&&d.outlets.length){outlets=d.outlets;localStorage.setItem('pc4_outlets',JSON.stringify(outlets));}
+    if(d.entries&&d.entries.length){entries=d.entries;entryCounter=Math.max(0,...entries.map(e=>+e.id||0));localStorage.setItem('pc4_entries',JSON.stringify(entries));localStorage.setItem('pc4_ec',entryCounter);}
+    if(d.slips&&d.slips.length){slips=d.slips;localStorage.setItem('pc4_slips',JSON.stringify(slips));}
     setSyncStatus('ok','Synced ✓');
     return true;
-  }catch(e){setSyncStatus('error','Could not load: '+e.message);return false;}
+  }catch(e){setSyncStatus('error','Offline — using local data');return false;}
 }
 
 async function pushToSheet(){
   setSyncStatus('syncing','Saving…');
   try{
-    await gasPost({action:'saveOutlets',outlets});
-    await gasPost({action:'saveEntries',entries});
-    await gasPost({action:'saveSlips',slips});
+    const resp = await Promise.race([
+      fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveOutlets',outlets}))+'&action=saveOutlets'),
+      new Promise((_,reject)=>setTimeout(()=>reject(new Error('Timeout')),10000))
+    ]);
+    await fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveEntries',entries}))+'&action=saveEntries');
+    await fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify({action:'saveSlips',slips}))+'&action=saveSlips');
     setSyncStatus('ok','Saved ✓');
-  }catch(e){setSyncStatus('error','Sync failed: '+e.message);}
+  }catch(e){setSyncStatus('error','Saved locally only');}
 }
 
 async function manualSync(){
@@ -826,12 +835,14 @@ function printHtml(html){
   const ao=getAO(),o=outlets.find(x=>x.id===ao);
   document.getElementById('activeOutletName').textContent=o?o.name:'No outlet';
   renderTxTable();
-  const ok=await loadFromSheet();
-  if(ok){
-    populateAllSelects();renderOutlets();
-    const ao2=getAO(),o2=outlets.find(x=>x.id===ao2);
-    document.getElementById('activeOutletName').textContent=o2?o2.name:'No outlet';
-  }
+  // Load from sheet in background — don't block UI
+  loadFromSheet().then(ok=>{
+    if(ok){
+      populateAllSelects();renderOutlets();
+      const ao2=getAO(),o2=outlets.find(x=>x.id===ao2);
+      document.getElementById('activeOutletName').textContent=o2?o2.name:'No outlet';
+    }
+  });
 })();
 </script>
 </body>
