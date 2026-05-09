@@ -361,11 +361,14 @@ let entryCounter = parseInt(localStorage.getItem('pc4_ec')||'0');
 let txRows = [];
 
 function persist(){
-  localStorage.setItem('pc4_outlets',JSON.stringify(outlets));
-  localStorage.setItem('pc4_entries',JSON.stringify(entries));
-  localStorage.setItem('pc4_slips',JSON.stringify(slips));
-  localStorage.setItem('pc4_ec',entryCounter);
-  pushToSheet();
+  try{
+    localStorage.setItem('pc4_outlets',JSON.stringify(outlets));
+    localStorage.setItem('pc4_entries',JSON.stringify(entries));
+    localStorage.setItem('pc4_slips',JSON.stringify(slips));
+    localStorage.setItem('pc4_ec',entryCounter);
+  }catch(e){ console.warn('LocalStorage error:',e); }
+  // Push to sheet in background
+  setTimeout(()=>{ try{ pushToSheet(); }catch(e){ console.warn('Sync error:',e); } },0);
 }
 
 // ── SYNC ──────────────────────────────────────────────────
@@ -461,15 +464,20 @@ function renderOutlets(){
     </div>`).join('');
 }
 function addOutlet(){
-  const name=document.getElementById('newOutletName').value.trim();
-  const flt=parseFloat(document.getElementById('newOutletFloat').value);
-  if(!name||isNaN(flt)||flt<0){alert('Enter a valid outlet name and float.');return;}
-  const id='o'+Date.now();
-  outlets.push({id,name,float:flt});
-  persist();renderOutlets();populateAllSelects();
-  document.getElementById('newOutletName').value='';
-  document.getElementById('newOutletFloat').value='';
-  if(!getAO()) setAO(id);
+  try{
+    const name=document.getElementById('newOutletName').value.trim();
+    const flt=parseFloat(document.getElementById('newOutletFloat').value);
+    if(!name||isNaN(flt)||flt<0){alert('Enter a valid outlet name and float.');return;}
+    const id='o'+Date.now();
+    outlets.push({id,name,float:flt});
+    localStorage.setItem('pc4_outlets',JSON.stringify(outlets));
+    renderOutlets();populateAllSelects();
+    document.getElementById('newOutletName').value='';
+    document.getElementById('newOutletFloat').value='';
+    if(!getAO()) setAO(id);
+    // Push to sheet in background, don't block
+    try{ pushToSheet(); }catch(e){ console.warn('Sync error:',e); }
+  }catch(e){ alert('Error adding outlet: '+e.message); }
 }
 function delOutlet(id){
   if(!confirm('Delete outlet? Entries are kept.'))return;
