@@ -330,7 +330,7 @@ main{max-width:1200px;margin:0 auto;padding:1.25rem}
 </main>
 
 <script>
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbwDEf4vKhY3z7SIr9ep1ilxqscDwoybS6llkmj_IqexlwaRtGbKE5Co8Zhu-h7yp3UY/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbyJBfasdrPqeQ-9IwNOWEPeDEHL9fj31gN3wyjkSSaU0LTnoNFc07QYqMm2CVZvF50d/exec';
 var outlets = JSON.parse(localStorage.getItem('pc4_outlets')||'[]');
 var entries = JSON.parse(localStorage.getItem('pc4_entries')||'[]');
 var slips   = JSON.parse(localStorage.getItem('pc4_slips')||'[]');
@@ -485,15 +485,20 @@ function handlePhoto(input){
 function extractTransactions(base64,filename){
   document.getElementById('loadingAI').style.display='flex';
   var mimeType=/\.png$/i.test(filename)?'image/png':'image/jpeg';
-  var payload={action:'extractPhoto',imageBase64:base64.split(',')[1],mimeType:mimeType};
-  fetch(GAS_URL+'?payload='+encodeURIComponent(JSON.stringify(payload))+'&action=extractPhoto')
+  var imageData=base64.split(',')[1];
+  // Use form POST to avoid URL length limits with large images
+  var formData=new FormData();
+  formData.append('action','extractPhoto');
+  formData.append('imageBase64',imageData);
+  formData.append('mimeType',mimeType);
+  fetch(GAS_URL,{method:'POST',body:formData})
   .then(function(r){return r.json();})
   .then(function(data){
     if(!data.ok) throw new Error(data.error||'Extraction failed');
     var rows=data.data;
     if(!Array.isArray(rows)){var f=Object.values(rows).find(function(v){return Array.isArray(v);});rows=f||[];}
     if(!rows.length){alert('No rows extracted. Add rows manually.');document.getElementById('loadingAI').style.display='none';return;}
-    txRows=rows.map(function(r){return {
+    txRows=rows.map(function(r){return{
       _id:uid(),name:r.name||'',date:r.date||'',day:r.day||'',
       opening:+r.opening_balance||0,sales:+r.cash_sales||0,expenses:+r.expenses||0,
       closing:+r.closing_balance||0,bankedIn:+r.bank_in_amount||0,
