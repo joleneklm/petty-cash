@@ -504,6 +504,8 @@ function extractTransactions(base64,filename){
       closing:+r.closing_balance||0,bankedIn:+r.bank_in_amount||0,
       statedLoose:+r.loose_change||0,accumOverride:null
     };});
+    // Sort by date ascending
+    txRows.sort(function(a,b){return a.date.localeCompare(b.date);});
     renderTxTable();
     document.getElementById('loadingAI').style.display='none';
   })
@@ -659,8 +661,11 @@ function renderRegister(){
 
 function deleteEntry(id){
   if(!confirm('Delete this entry?'))return;
-  entries=entries.filter(function(e){return e.id!==id;});
-  persist();renderRegister();renderSlipEntries();
+  entries=entries.filter(function(e){return String(e.id)!==String(id);});
+  persist();
+  populateFilterSelects();
+  renderRegister();
+  renderSlipEntries();
 }
 
 function renderSlipEntries(){
